@@ -1,11 +1,12 @@
 import { Tcp } from "./Tcp";
+import connectDB from "../helpers/db";
 
 import { IService } from "types/services";
 
 export class App implements IService {
   private static instance: App;
 
-  private tcp: IService = new Tcp(); // Екземпляр сервіса TCP
+  private tcp: IService = new Tcp(); 
 
   constructor() {
     if (!App.instance) {
@@ -18,6 +19,8 @@ export class App implements IService {
   async init() {
     const { tcp } = this;
     console.log("App started");
+
+    await connectDB();
 
     await tcp.init();
 
