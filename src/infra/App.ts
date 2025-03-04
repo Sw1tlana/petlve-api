@@ -6,7 +6,7 @@ import { IService } from "types/services";
 export class App implements IService {
   private static instance: App;
 
-  private tcp: IService = new Tcp(); 
+  private tcp: IService = new Tcp();
 
   constructor() {
     if (!App.instance) {
@@ -21,7 +21,6 @@ export class App implements IService {
     console.log("App started");
 
     await connectDB();
-
     await tcp.init();
 
     return true;

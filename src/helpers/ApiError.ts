@@ -31,5 +31,3 @@ export class ApiError extends HttpError {
   };
 }
 
-// YjQ8heKcaGbcSvit
-// svitlana
