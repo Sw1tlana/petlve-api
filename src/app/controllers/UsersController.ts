@@ -52,6 +52,8 @@ export class UsersController {
         process.env.JWT_SECRET, 
         { expiresIn: "1h" }
       );
+
+      await User.findByIdAndUpdate(user._id, { token }, { new: true });
   
       return new ApiResponse(true, { 
         message: "Login successful", 
@@ -68,6 +70,19 @@ export class UsersController {
       return new ApiError(500, { message: "Internal server error" });
     }
   }
+
+  @Post("/signout")
+  async signOut(@Body() body: { userId: string }) {
+    try {
+      await User.findByIdAndUpdate(body.userId, { token: null }, {new: true});
+
+      return new ApiResponse(true, { message: "User logged out successfully" });
+
+    }catch(error) {
+      return new ApiError(500, { message: "Internal server error" });
+    }
+  }
+
 
   @Get()
   async getUsers() {
