@@ -6,7 +6,7 @@ import { useExpressServer } from "routing-controllers";
 import { IService } from "types/services";
 import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger"; 
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
-import { AuthMiddleware } from "../app/middlewares/AuthMiddleware";
+// import { AuthMiddleware } from "../app/middlewares/AuthMiddleware";
 import { UsersController } from "../app/controllers/UsersController";
 
 // Оголошуємо клас Tcp, який реалізує інтерфейс IService
@@ -38,7 +38,7 @@ export class Tcp implements IService {
     useExpressServer(server, {
       routePrefix,
       controllers: [UsersController],
-      middlewares: [HTTPRequestLogger, HTTPResponseLogger, AuthMiddleware],
+      middlewares: [HTTPRequestLogger, HTTPResponseLogger],
       cors: true,
       defaultErrorHandler: true,
       validation: false, // Відключаємо вбудовану валідацію, щоб ми могли перевірити DTO самі всередині контролера

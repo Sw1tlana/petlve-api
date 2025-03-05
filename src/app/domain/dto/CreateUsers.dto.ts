@@ -1,4 +1,4 @@
-import { IsEmail, Length, IsInt, Min, Max, IsString, IsPhoneNumber } from "class-validator";
+import { IsEmail, Length, IsString, IsPhoneNumber } from "class-validator";
 import { IUsers } from "../users/Users.types";
 
 export class CreateUsers implements Omit<IUsers, "id"> {
@@ -6,6 +6,7 @@ export class CreateUsers implements Omit<IUsers, "id"> {
   name: string;
 
   @IsEmail()
+  @Length(7, 20)
   email: string;
   
   @IsString() 
@@ -13,6 +14,6 @@ export class CreateUsers implements Omit<IUsers, "id"> {
   phone: string;
 
   @IsString()
-  @Length(6, 50)
+  @Length(7, 20)
   password: string;
 }

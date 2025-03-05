@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, minlength: 2, maxlength: 20 },
@@ -6,6 +6,8 @@ const UserSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   password: { type: String, required: true },
   token: { type: String, default: null },
+  refreshToken: { type: String, default: null },
+  noticesFavorites: [{ type: Schema.Types.ObjectId, ref: "Notice" }],
 });
 
 export const User = mongoose.model("User", UserSchema);
