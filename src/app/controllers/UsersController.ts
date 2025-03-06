@@ -118,7 +118,6 @@ export class UsersController {
 
 }
 
-
   @Post("/signout") 
   async signOut(@Body() body: { userId: string }) {
     try {
@@ -136,11 +135,13 @@ export class UsersController {
   async getCurrentUser(request: Request ) {
     try { 
       const authorizationHeader = request.headers['authorization'];
-      if (!authorizationHeader) {
-        return new ApiResponse(true, { message: "Token is required" });
-      }
 
-      const token = request.headers['authorization']?.split(' ')[1]; 
+      if (!authorizationHeader) {
+        return new ApiError(400, { message: "Token is required" });
+      }
+      
+      const token = authorizationHeader.split(' ')[1];
+      
 
       if (!token) {
         return new ApiError(400, { message: "Token is required" });

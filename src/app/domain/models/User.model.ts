@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+import { IUsers } from "../users/Users.types";
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, minlength: 2, maxlength: 20 },
@@ -10,4 +11,4 @@ const UserSchema = new mongoose.Schema({
   noticesFavorites: [{ type: Schema.Types.ObjectId, ref: "Notice" }],
 });
 
-export const User = mongoose.model("User", UserSchema);
+export const User = mongoose.model<IUsers & Document>("User", UserSchema);
