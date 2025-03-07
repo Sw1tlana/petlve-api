@@ -1,4 +1,4 @@
-import { IsNumber, IsString  } from "class-validator";
+import { IsDate, IsNumber, IsString  } from "class-validator";
 import { INotices } from "../notices/Notices.types";
 
 export class CreateNotices implements Omit<INotices, "id"> {
@@ -33,8 +33,8 @@ export class CreateNotices implements Omit<INotices, "id"> {
     @IsString()
     imgURL: string;
   
-    @IsString()
-    createdAt: string;
+    @IsDate() 
+    createdAt: Date;
   
     @IsString()
     user: string;
@@ -42,7 +42,7 @@ export class CreateNotices implements Omit<INotices, "id"> {
     @IsNumber()
     popularity: number;
   
-    @IsString()
-    updatedAt: string;
+    @IsDate()
+    updatedAt: Date;
 
 }

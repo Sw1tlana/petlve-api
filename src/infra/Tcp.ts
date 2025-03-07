@@ -8,6 +8,7 @@ import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger";
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
 import { UsersController } from "../app/controllers/UsersController";
 import { NoticesController } from "app/controllers/NoticesController";
+import { FriendsController } from "app/controllers/FriendsController";
 
 // Оголошуємо клас Tcp, який реалізує інтерфейс IService
 export class Tcp implements IService {
@@ -37,7 +38,9 @@ export class Tcp implements IService {
     // Використовуємо бібліотеку routing-controllers для налаштування маршрутів
     useExpressServer(server, {
       routePrefix,
-      controllers: [UsersController, NoticesController],
+      controllers: [UsersController, 
+                    NoticesController,
+                    FriendsController],
       middlewares: [HTTPRequestLogger, HTTPResponseLogger],
       cors: true,
       defaultErrorHandler: true,

@@ -10,8 +10,8 @@ export interface INotices {
     sex: string;
     location: string;
     imgURL: string;
-    createdAt: string;
+    createdAt: Date;
     user: string;
     popularity: number;
-    updatedAt: string;
+    updatedAt: Date;
 }
