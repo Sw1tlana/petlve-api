@@ -1,14 +1,5 @@
-import { IsString, IsBoolean, IsUrl, IsArray, ArrayMinSize, ArrayMaxSize, IsObject } from "class-validator";
+import { IsString, IsUrl, IsArray, ArrayMinSize, ArrayMaxSize, IsObject } from "class-validator";
 import { IFriends } from "../friends/Friends.types";
-
-// Тип для одного робочого дня
-type WorkDay = { 
-  id?: string;  
-  _id?: string;
-  isOpen: boolean; 
-  from?: string; 
-  to?: string; 
-};
 
 export class CreateFriends implements Omit<IFriends, "id"> {
   

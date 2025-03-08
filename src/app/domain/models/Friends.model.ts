@@ -8,7 +8,6 @@ const WorkDaySchema = new Schema({
     to: { type: String, required: false }
   });
   
-  // Опис основної схеми Friend
   const FriendSchema = new Schema<IFriends & Document>({
     _id: { type: String, required: true },
     title: { type: String, required: true },

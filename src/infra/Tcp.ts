@@ -9,6 +9,8 @@ import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
 import { UsersController } from "../app/controllers/UsersController";
 import { NoticesController } from "app/controllers/NoticesController";
 import { FriendsController } from "app/controllers/FriendsController";
+import { NewsController } from "app/controllers/NewsController"
+import { CitiesController } from "app/controllers/CitiesController";
 
 // Оголошуємо клас Tcp, який реалізує інтерфейс IService
 export class Tcp implements IService {
@@ -40,8 +42,11 @@ export class Tcp implements IService {
       routePrefix,
       controllers: [UsersController, 
                     NoticesController,
-                    FriendsController],
-      middlewares: [HTTPRequestLogger, HTTPResponseLogger],
+                    FriendsController,
+                    NewsController,
+                    CitiesController],
+      middlewares: [HTTPRequestLogger, 
+                    HTTPResponseLogger],
       cors: true,
       defaultErrorHandler: true,
       validation: false, // Відключаємо вбудовану валідацію, щоб ми могли перевірити DTO самі всередині контролера
