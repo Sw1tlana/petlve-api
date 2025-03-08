@@ -4,6 +4,7 @@ import { useExpressServer } from "routing-controllers";
 
 // Імпортуємо наш інтерфейс сервісу і контролери
 import { IService } from "types/services";
+import { authorizationChecker } from "../utils/authorizationChecker";
 import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger"; 
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
 import { UsersController } from "../app/controllers/UsersController";
@@ -49,10 +50,10 @@ export class Tcp implements IService {
                     HTTPResponseLogger],
       cors: true,
       defaultErrorHandler: true,
-      validation: false, // Відключаємо вбудовану валідацію, щоб ми могли перевірити DTO самі всередині контролера
+      validation: false,
+      authorizationChecker,   
     });
 
-    // Повертаємо Promise, який успішно виконується, коли сервер починає слухати порт
     return new Promise<boolean>((resolve) => {
       server.listen(4000, () => {
         console.log("Tcp service started on port 4000");

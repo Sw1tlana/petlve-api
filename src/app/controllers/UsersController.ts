@@ -7,11 +7,7 @@ import { CreateUsers } from "../domain/dto/CreateUsers.dto";
 import { ApiResponse } from "../../helpers/ApiResponse";
 import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
-
-interface DecodedToken {
-  id: string;
-  name: string;
-}
+import { Notice } from "app/domain/models/Notices.model";
 
 @JsonController("/users")
 export class UsersController {
@@ -159,11 +155,14 @@ export class UsersController {
         return new ApiError(404, { message: "User not found" });
       }
 
+      const noticesFavorites = await Notice.find({ user: user._id });
+
       return new ApiResponse(true, {
         _id: user._id,
         name: user.name,
-        email: user.email
-    
+        email: user.email,
+        token, 
+        noticesFavorites
       });
       
     }catch(error) {

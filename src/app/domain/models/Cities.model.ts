@@ -9,4 +9,4 @@ const CitiesSchema = new mongoose.Schema({
     countyEn: { type: String, required: true },
 });
 
-export const Citie = mongoose.model<ICities & Document>("Citie", CitiesSchema);
+export const City = mongoose.model<ICities & Document>("City", CitiesSchema);
