@@ -1,7 +1,7 @@
 import { IsEmail, Length, IsString, IsPhoneNumber } from "class-validator";
 import { IUsers } from "../users/Users.types";
 
-export class CreateUsers implements Omit<IUsers, "id"> {
+export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @Length(2, 20)
   name: string;
 

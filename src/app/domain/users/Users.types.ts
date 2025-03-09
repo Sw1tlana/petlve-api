@@ -1,7 +1,12 @@
+import { Types } from "mongoose";
+
 export interface IUsers {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
+  _id: Types.ObjectId; 
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  tokens?: string[];
+  refreshToken?: string;
+  noticesFavorites: Types.ObjectId[];
   }

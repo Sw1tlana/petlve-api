@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Authorized } from "routing-controllers";
+import { JsonController, Get, Post, Body, Authorized, CurrentUser } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -8,6 +8,7 @@ import { ApiResponse } from "../../helpers/ApiResponse";
 import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { Notice } from "app/domain/models/Notices.model";
+import { IUsers } from "app/domain/users/Users.types";
 
 @JsonController("/users")
 export class UsersController {
@@ -61,6 +62,7 @@ export class UsersController {
       const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET_KEY, { expiresIn: "30d" });
 
       await User.findByIdAndUpdate(user._id, { token, refreshToken }, { new: true });
+      console.log("Updated User Token:", token);
   
       return new ApiResponse(true, { 
         message: "Login successful", 
@@ -77,7 +79,6 @@ export class UsersController {
     }
   }
 
-
   @Post("/refresh-tokens")
   async refreshTokens(@Body() body: { refreshToken: string }) {
     const { refreshToken } = body;
@@ -87,15 +88,9 @@ export class UsersController {
     }
 
     try {
-      jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY)
-    }catch(error) {
-      return new ApiError(401, { message: "Refresh token is invalid or expired" });
-    }
-
-    const decoded: any = jwt.decode(refreshToken);
-    const { id } = decoded;
-
-    const user = await User.findById(id);
+      const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY);
+      const { id } = decoded as { id: string }; 
+      const user = await User.findById(id);
 
     if (!user) {
       return new ApiError(404, { message: "User not found" });
@@ -111,7 +106,38 @@ export class UsersController {
     token: newToken,
     refreshToken: newRefreshToken 
 });
+} catch (error) {
+  if (error.name === 'TokenExpiredError') {
+    return new ApiError(401, { message: "Refresh token is expired" });
+  } else {
+    return new ApiError(401, { message: "Refresh token is invalid" });
+  }
+}
+}
 
+@Get("/current") 
+@Authorized()
+async getCurrentUser(@CurrentUser() user: IUsers) {
+  try { 
+    console.log("Current user from request:", user);
+    if (!user) {
+      console.log("User not found");
+      return new ApiError(404, { message: "User not found" });
+    }
+
+    const noticesFavorites = await Notice.find({ user: user._id }).exec();
+
+    return new ApiResponse(true, {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      noticesFavorites
+    });
+
+  } catch (error) {
+    console.error("Internal server error:", error);
+    return new ApiError(500, { message: "Internal server error" });
+  }
 }
 
   @Post("/signout") 
@@ -125,52 +151,7 @@ export class UsersController {
       return new ApiError(500, { message: "Internal server error" });
     }
   }
-
-  @Get("/current") 
-  @Authorized()
-  async getCurrentUser(request: Request ) {
-    try { 
-      const authorizationHeader = request.headers['authorization'];
-
-      if (!authorizationHeader) {
-        return new ApiError(400, { message: "Token is required" });
-      }
-      
-      const token = authorizationHeader.split(' ')[1];
-      
-
-      if (!token) {
-        return new ApiError(400, { message: "Token is required" });
-      }
-
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
-
-      if (!decoded || !decoded.id) {
-        return new ApiError(401, { message: "Invalid token" });
-      }
-
-      const user = await User.findById(decoded.id); 
-
-      if (!user) {
-        return new ApiError(404, { message: "User not found" });
-      }
-
-      const noticesFavorites = await Notice.find({ user: user._id });
-
-      return new ApiResponse(true, {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token, 
-        noticesFavorites
-      });
-      
-    }catch(error) {
-      return new ApiError(500, { message: "Internal server error" });
-    }
-  }
   
-
   @Get()
   async getUsers() {
     try {
