@@ -13,10 +13,8 @@ const NoticeSchema = new mongoose.Schema({
     sex: { type: String, required: true },
     location: { type: String, required: true },
     imgURL: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
     user: { type: String, required: true },
     popularity: { type: Number, default: 0 },
-    updatedAt: { type: Date, default: Date.now }
 }, {
     timestamps: true,
 })

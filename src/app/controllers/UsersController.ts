@@ -7,8 +7,9 @@ import { CreateUsers } from "../domain/dto/CreateUsers.dto";
 import { ApiResponse } from "../../helpers/ApiResponse";
 import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
-import { Notice } from "app/domain/models/Notices.model";
 import { IUsers } from "app/domain/users/Users.types";
+import { Pet } from "app/domain/models/Pets.model";
+import { Types } from "mongoose";
 
 @JsonController("/users")
 export class UsersController {
@@ -117,26 +118,83 @@ export class UsersController {
 
 @Get("/current") 
 @Authorized()
-async getCurrentUser(@CurrentUser() user: IUsers) {
+async getCurrentUser(@CurrentUser() currentUser: IUsers) {
   try { 
-    console.log("Current user from request:", user);
-    if (!user) {
+    console.log("Current user from request:", currentUser);
+
+    if (!currentUser) {
       console.log("User not found");
       return new ApiError(404, { message: "User not found" });
     }
 
-    const noticesFavorites = await Notice.find({ user: user._id }).exec();
+    const userFromDb = await User.findById(currentUser._id)
+      .populate('noticesFavorites') 
+      .lean(); 
+
+    if (!userFromDb) {
+      console.log("User not found in database");
+      return new ApiError(404, { message: "User not found in database" });
+    }
 
     return new ApiResponse(true, {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      noticesFavorites
+      _id: userFromDb._id.toString(),
+      name: userFromDb.name,
+      email: userFromDb.email,
+      noticesFavorites: userFromDb.noticesFavorites, 
     });
 
   } catch (error) {
     console.error("Internal server error:", error);
     return new ApiError(500, { message: "Internal server error" });
+  }
+}
+
+@Get("/current/full") 
+@Authorized()
+async getCurrentFull(@CurrentUser() currentUser: IUsers) {
+  return currentUser;
+}
+
+@Post("/current/pets/add") 
+@Authorized()
+async addCurrentPets(@CurrentUser() currentUser: IUsers,
+@Body() body: {    
+        species: string;
+        title: string;
+        name: string;
+        birthday: string;
+        sex: string;
+        imgURL: string;
+      }
+) {
+
+  try {
+    const { name, species, title, birthday, sex, imgURL } = body;
+    const userId = currentUser._id;
+    const newPet = new Pet({
+      name,
+      species,
+      birthday,
+      sex,
+      title,
+      imgURL,
+      owner: userId, 
+    });
+
+    await newPet.save();
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { status: 404, message: "User not found" };
+    }
+
+    user.pets.push(newPet._id as Types.ObjectId); 
+    await user.save();
+
+    return new ApiResponse(true, {message: "Pet added successfully", pet: newPet});
+  
+  }catch(error) {
+    return new ApiError(500, {message: "Something went wrong"});
   }
 }
 

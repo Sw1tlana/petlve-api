@@ -9,4 +9,5 @@ export interface IUsers {
   tokens?: string[];
   refreshToken?: string;
   noticesFavorites: Types.ObjectId[];
+  pets: Types.ObjectId[];
   }

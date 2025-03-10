@@ -1,7 +1,10 @@
 import { Notice } from "app/domain/models/Notices.model";
+import { User } from "app/domain/models/User.model";
+import { IUsers } from "app/domain/users/Users.types";
 import { ApiError } from "helpers/ApiError";
 import { ApiResponse } from "helpers/ApiResponse";
-import { JsonController, Get, Post, Param, Delete } from "routing-controllers";
+import mongoose from "mongoose";
+import { JsonController, Get, Post, Param, Delete, Authorized, CurrentUser } from "routing-controllers";
 
 @JsonController("/notices")
 export class NoticesController {
@@ -70,15 +73,31 @@ async getNoticesById(@Param('id') id: string) {
 }
 
 @Post("/favorites/add/:id")
-async addNoticeFavorites(@Param('id') id: string) {
+@Authorized() 
+async addNoticeFavorites(@Param('id') id: string,
+@CurrentUser() user: IUsers) {
+
   try {
-   const favorite = await Notice.findOne({ _id: id }).lean();
+   const favorite = await Notice.findById(id).lean();
 
     if (!favorite) {
         return new ApiError(404, { message: "Notice not found" });
     }
 
-      return new ApiResponse(true, { data: favorite });
+    const isAlreadyFavorite = user.noticesFavorites.some(
+        (favId) => favId.toString() === id
+      );
+  
+      if (isAlreadyFavorite) {
+        return new ApiResponse(true, { message: "Already in favorites" });
+      }
+
+      await User.findByIdAndUpdate(user._id, {
+        $push: { noticesFavorites: id },
+      });
+  
+
+      return new ApiResponse(true, { message: "Added to favorites",  favorite });
 
   } catch (error) {
       return new ApiError(500, { message: "Internal server error" });
@@ -86,15 +105,31 @@ async addNoticeFavorites(@Param('id') id: string) {
 }
 
 @Delete("/favorites/remove/:id")
-async deleteNoticeFavorites(@Param('id') id: string) {
+async deleteNoticeFavorites(@Param('id') id: string,
+@CurrentUser() user: IUsers) {
   try {
-   const removeFavorite = await Notice.findOne({ _id: id }).lean();
 
-    if (!removeFavorite) {
-        return new ApiError(404, { message: "Notice not found" });
-    }
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return new ApiError(400, { message: "Invalid ID format" });
+      }
 
-      return new ApiResponse(true, { data: removeFavorite });
+    const isFavorite = user.noticesFavorites.some((favId) => favId.toString() === id);
+
+        if (!isFavorite) {
+        return new ApiError(404, { message: "Notice not in favorites" });
+  }
+
+        await User.findByIdAndUpdate(user._id, {
+            $pull: { noticesFavorites: id }
+        });
+
+        const removeFavorite = await Notice.findById(id).lean();
+
+        if (!removeFavorite) {
+            return new ApiError(404, { message: "Notice not found" });
+          }
+
+      return new ApiResponse(true, { message: "Removed from favorites", data: removeFavorite });
 
   } catch (error) {
       return new ApiError(500, { message: "Internal server error" });

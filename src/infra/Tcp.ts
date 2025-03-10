@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import express from "express";
-import { useExpressServer } from "routing-controllers";
+import { useExpressServer, Action } from "routing-controllers";
+import jwt from "jsonwebtoken";
 
 // Імпортуємо наш інтерфейс сервісу і контролери
 import { IService } from "types/services";
@@ -12,6 +13,7 @@ import { NoticesController } from "app/controllers/NoticesController";
 import { FriendsController } from "app/controllers/FriendsController";
 import { NewsController } from "app/controllers/NewsController"
 import { CitiesController } from "app/controllers/CitiesController";
+import { User } from "../app/domain/models/User.model";
 
 // Оголошуємо клас Tcp, який реалізує інтерфейс IService
 export class Tcp implements IService {
@@ -29,6 +31,42 @@ export class Tcp implements IService {
 
     // Повертаємо посилання на єдиний екземпляр класу
     return Tcp.instance;
+  }
+
+  private async currentUserChecker(action: Action) {
+    try {
+      const { authorization = "" } = action.request.headers;
+      if (!authorization.startsWith("Bearer ")) {
+        console.log("Invalid or missing authorization header");
+        return null;
+      }
+
+      const token = authorization.split(" ")[1];
+      console.log("Received token:", token);
+
+      if (!token) {
+        console.log("Token is missing");
+        return null;
+      }
+
+      // Розшифровуємо токен
+      const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("Decoded token:", decoded);
+
+      if (!decoded || !decoded.id) {
+        console.log("Invalid token payload");
+        return null;
+      }
+
+      // Шукаємо користувача в базі
+      const user = await User.findById(decoded.id);
+      console.log("User from database:", user);
+
+      return user || null;
+    } catch (error) {
+      console.error("Token verification error:", error.message);
+      return null;
+    }
   }
 
   // Метод для ініціалізації сервісу
@@ -51,7 +89,8 @@ export class Tcp implements IService {
       cors: true,
       defaultErrorHandler: true,
       validation: false,
-      authorizationChecker,   
+      authorizationChecker, 
+      currentUserChecker: this.currentUserChecker,  
     });
 
     return new Promise<boolean>((resolve) => {
