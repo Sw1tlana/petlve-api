@@ -1,5 +1,6 @@
-import { IsEmail, Length, IsString, IsPhoneNumber } from "class-validator";
+import { IsEmail, Length, IsString, IsPhoneNumber, IsOptional, IsArray } from "class-validator";
 import { IUsers } from "../users/Users.types";
+import { Types } from "mongoose";
 
 export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @Length(2, 20)
@@ -16,4 +17,9 @@ export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @IsString()
   @Length(7, 20)
   password: string;
+
+  @IsArray()
+  @IsOptional() 
+  pets: Types.ObjectId[] = [];
 }
+

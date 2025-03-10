@@ -155,46 +155,47 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
   return currentUser;
 }
 
-@Post("/current/pets/add") 
+@Post("/current/pets/add")
 @Authorized()
 async addCurrentPets(@CurrentUser() currentUser: IUsers,
-@Body() body: {    
-        species: string;
-        title: string;
-        name: string;
-        birthday: string;
-        sex: string;
-        imgURL: string;
-      }
-) {
+  @Body() body: { species: string; title: string; name: string; birthday: string; sex: string; imgURL: string }) {
 
   try {
     const { name, species, title, birthday, sex, imgURL } = body;
-    const userId = currentUser._id;
-    const newPet = new Pet({
+    const userId = currentUser?._id;
+
+    if (!userId) {
+      throw new ApiError(400, { message: "User ID is missing" });
+    }
+    console.log("User ID:", userId);
+
+    const newPet = await Pet.create({
       name,
       species,
       birthday,
       sex,
       title,
       imgURL,
-      owner: userId, 
+      owner: userId,
     });
 
-    await newPet.save();
+    console.log("User ID:", userId);
+    console.log("Created Pet:", newPet);
 
-    const user = await User.findById(userId);
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $push: { pets: newPet._id } },
+      { new: true } 
+    ).exec();
+
     if (!user) {
-      return { status: 404, message: "User not found" };
+      throw new ApiError(404, { message: "User not found" });
     }
 
-    user.pets.push(newPet._id as Types.ObjectId); 
-    await user.save();
-
-    return new ApiResponse(true, {message: "Pet added successfully", pet: newPet});
-  
-  }catch(error) {
-    return new ApiError(500, {message: "Something went wrong"});
+    return new ApiResponse(true, { message: "Pet added successfully", pet: newPet });
+  } catch (error) {
+    console.error("Error adding pet:", error);
+    return new ApiError(500, { message: "Something went wrong" });
   }
 }
 
