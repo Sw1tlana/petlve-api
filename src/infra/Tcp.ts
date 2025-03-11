@@ -83,12 +83,13 @@ export class Tcp {
       currentUserChecker: this.currentUserChecker,  
     });
 
-    return new Promise<boolean>((resolve) => {
-      server.listen(4000, () => {
-        console.log("Tcp service started on port 4000");
+    const PORT = process.env.PORT || 4000; 
 
-        return resolve(true);
+    return new Promise<boolean>((resolve) => {
+      server.listen(PORT, () => {
+        console.log(`Tcp service started on port ${PORT}`);
+        resolve(true); 
       });
-    });
+    })
   }
 }
