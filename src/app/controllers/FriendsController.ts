@@ -1,6 +1,6 @@
-import { Friend } from "app/domain/models/Friends.model";
-import { ApiError } from "helpers/ApiError";
-import { ApiResponse } from "helpers/ApiResponse";
+import { Friend } from "../domain/models/Friends.model";
+import { ApiError } from "../../helpers/ApiError";
+import { ApiResponse } from "../../helpers/ApiResponse";
 import { JsonController, Get } from "routing-controllers";
 
 @JsonController("/friends")

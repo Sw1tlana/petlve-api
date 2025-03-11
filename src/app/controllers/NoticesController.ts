@@ -1,8 +1,8 @@
-import { Notice } from "app/domain/models/Notices.model";
-import { User } from "app/domain/models/User.model";
-import { IUsers } from "app/domain/users/Users.types";
-import { ApiError } from "helpers/ApiError";
-import { ApiResponse } from "helpers/ApiResponse";
+import { Notice } from "../domain/models/Notices.model";
+import { User } from "../domain/models/User.model";
+import { IUsers } from "../domain/users/Users.types";
+import { ApiError } from "../../helpers/ApiError";
+import { ApiResponse } from "../../helpers/ApiResponse";
 import mongoose from "mongoose";
 import { JsonController, Get, Post, Param, Delete, Authorized, CurrentUser } from "routing-controllers";
 

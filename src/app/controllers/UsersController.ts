@@ -3,13 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose, { Types } from "mongoose";
 
-import { User } from "app/domain/models/User.model";
+import { User } from "../domain/models/User.model";
 import { CreateUsers } from "../domain/dto/CreateUsers.dto";
 import { ApiResponse } from "../../helpers/ApiResponse";
 import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
-import { IUsers } from "app/domain/users/Users.types";
-import { Pet } from "app/domain/models/Pets.model";
+import { IUsers } from "../domain/users/Users.types";
+import { Pet } from "../domain/models/Pets.model";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {

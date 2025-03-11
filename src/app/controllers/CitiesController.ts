@@ -1,6 +1,6 @@
 import { City } from "../domain/models/Cities.model";
-import { ApiError } from "helpers/ApiError";
-import { ApiResponse } from "helpers/ApiResponse";
+import { ApiError } from "../../helpers/ApiError";
+import { ApiResponse } from "../../helpers/ApiResponse";
 import { JsonController, Get, Param, QueryParam } from "routing-controllers";
 
 @JsonController("/cities")

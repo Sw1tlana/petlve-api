@@ -1,6 +1,6 @@
-import { News } from "../../app/domain/models/News.model";
-import { ApiError } from "helpers/ApiError";
-import { ApiResponse } from "helpers/ApiResponse";
+import { News } from "../domain/models/News.model";
+import { ApiError } from "../../helpers/ApiError";
+import { ApiResponse } from "../../helpers/ApiResponse";
 import { JsonController, Get } from "routing-controllers";
 
 @JsonController("/news")

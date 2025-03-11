@@ -7,10 +7,10 @@ import { authorizationChecker } from "../utils/authorizationChecker";
 import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger"; 
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
 import { UsersController } from "../app/controllers/UsersController";
-import { NoticesController } from "app/controllers/NoticesController";
-import { FriendsController } from "app/controllers/FriendsController";
-import { NewsController } from "app/controllers/NewsController"
-import { CitiesController } from "app/controllers/CitiesController";
+import { NoticesController } from "../app/controllers/NoticesController";
+import { FriendsController } from "../app/controllers/FriendsController";
+import { NewsController } from "../app/controllers/NewsController";
+import { CitiesController } from "../app/controllers/CitiesController";
 import { User } from "../app/domain/models/User.model";
 
 export class Tcp {
