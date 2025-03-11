@@ -3,7 +3,6 @@ import express from "express";
 import { useExpressServer, Action } from "routing-controllers";
 import jwt from "jsonwebtoken";
 
-// Імпортуємо наш інтерфейс сервісу і контролери
 import { authorizationChecker } from "../utils/authorizationChecker";
 import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger"; 
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
@@ -14,21 +13,18 @@ import { NewsController } from "app/controllers/NewsController"
 import { CitiesController } from "app/controllers/CitiesController";
 import { User } from "../app/domain/models/User.model";
 
-// Оголошуємо клас Tcp, який реалізує інтерфейс IService
 export class Tcp {
-  private static instance: Tcp; // Ссылка на единственный экземпляр класса
+  private static instance: Tcp; 
 
-  private routePrefix = "/api"; // Префикс для маршрутов API
-  public server = express(); // Экземпляр Express.js
+  private routePrefix = "/api";
+  public server = express(); 
 
-  // Конструктор, що реалізує шаблон Singleton для класу Tcp
   constructor() {
-    // Якщо екземпляр ще не створено, зберігаємо посилання на поточний екземпляр
+
     if (!Tcp.instance) {
       Tcp.instance = this;
     }
 
-    // Повертаємо посилання на єдиний екземпляр класу
     return Tcp.instance;
   }
 
@@ -48,7 +44,6 @@ export class Tcp {
         return null;
       }
 
-      // Розшифровуємо токен
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
       console.log("Decoded token:", decoded);
 
@@ -57,7 +52,6 @@ export class Tcp {
         return null;
       }
 
-      // Шукаємо користувача в базі
       const user = await User.findById(decoded.id);
       console.log("User from database:", user);
 
@@ -68,14 +62,11 @@ export class Tcp {
     }
   }
 
-  // Метод для ініціалізації сервісу
   async init() {
     const { server, routePrefix } = this;
 
-    // Парсимо тіло запиту, потрібно для middlewares
     server.use(express.json());
 
-    // Використовуємо бібліотеку routing-controllers для налаштування маршрутів
     useExpressServer(server, {
       routePrefix,
       controllers: [UsersController, 

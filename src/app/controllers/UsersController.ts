@@ -72,7 +72,6 @@ export class UsersController {
       const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET_KEY, { expiresIn: "30d" });
 
       await User.findByIdAndUpdate(user._id, { token, refreshToken }, { new: true });
-      console.log("Updated User Token:", token);
   
       return new ApiResponse(true, { 
         message: "Login successful", 
@@ -84,7 +83,6 @@ export class UsersController {
         }
       });
     } catch (error) {
-      console.error("Error in signIn:", error);
       return new ApiError(500, { message: "Internal server error" });
     }
   }
@@ -129,7 +127,6 @@ export class UsersController {
 @Authorized()
 async getCurrentUser(@CurrentUser() currentUser: IUsers) {
   try { 
-    console.log("Current user from request:", currentUser);
 
     if (!currentUser) {
       console.log("User not found");
@@ -141,7 +138,6 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
       .lean(); 
 
     if (!userFromDb) {
-      console.log("User not found in database");
       return new ApiError(404, { message: "User not found in database" });
     }
 
@@ -153,7 +149,6 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
     });
 
   } catch (error) {
-    console.error("Internal server error:", error);
     return new ApiError(500, { message: "Internal server error" });
   }
 }
@@ -182,8 +177,8 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
 
 @Patch("/current/edit") 
 @Authorized()
-async patchCurrentEdit(@CurrentUser() currentUser: IUsers,
-@Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
+  async patchCurrentEdit(@CurrentUser() currentUser: IUsers,
+  @Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
 ) {
 try {
   const updatedUser = await User.findByIdAndUpdate(currentUser._id, userData, { new: true }).lean();
@@ -260,7 +255,6 @@ async addCurrentPets(
     });
 
   } catch (error) {
-    console.error(error);
     throw new ApiError(500, { message: "Internal server error" });
   }
 }

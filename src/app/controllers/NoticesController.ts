@@ -56,8 +56,8 @@ async getSpecies() {
     }
 }
 
-@Get("/:id")
-async getNoticesById(@Param('id') id: string) {
+    @Get("/:id")
+    async getNoticesById(@Param('id') id: string) {
   try {
    const notice = await Notice.findOne({ _id: id }).lean();
 
@@ -73,9 +73,9 @@ async getNoticesById(@Param('id') id: string) {
 }
 
 @Post("/favorites/add/:id")
-@Authorized() 
-async addNoticeFavorites(@Param('id') id: string,
-@CurrentUser() user: IUsers) {
+    @Authorized() 
+    async addNoticeFavorites(@Param('id') id: string,
+    @CurrentUser() user: IUsers) {
 
   try {
    const favorite = await Notice.findById(id).lean();
@@ -105,8 +105,8 @@ async addNoticeFavorites(@Param('id') id: string,
 }
 
 @Delete("/favorites/remove/:id")
-async deleteNoticeFavorites(@Param('id') id: string,
-@CurrentUser() user: IUsers) {
+    async deleteNoticeFavorites(@Param('id') id: string,
+    @CurrentUser() user: IUsers) {
   try {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
