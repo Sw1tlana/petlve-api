@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   token: { type: String, default: null },
   refreshToken: { type: String, default: null },
   noticesFavorites: [{ type: Schema.Types.ObjectId, ref: "Notice" }],
+  noticesViewed: [{ type: Schema.Types.ObjectId, ref: "Notice"}],
   pets: [{ type: Schema.Types.ObjectId, ref: "Pet" }],
 },
 { timestamps: true });

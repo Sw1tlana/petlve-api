@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Authorized, CurrentUser } from "routing-controllers";
+import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -9,7 +9,7 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "app/domain/users/Users.types";
 import { Pet } from "app/domain/models/Pets.model";
-import { Types } from "mongoose";
+import mongoose, { ObjectId, Types } from "mongoose";
 
 @JsonController("/users")
 export class UsersController {
@@ -152,14 +152,52 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
 @Get("/current/full") 
 @Authorized()
 async getCurrentFull(@CurrentUser() currentUser: IUsers) {
-  return currentUser;
+  const userWithDetails = await User.findById(currentUser._id)
+    .populate("noticesViewed noticesFavorites pets")
+    .lean();
+
+  if (!userWithDetails) {
+    throw new Error("User not found");
+  }
+
+  const convertId = (id: any) => {
+    if (id && id.buffer) {
+      return new Types.ObjectId(id.buffer.data).toString();
+    }
+    return id.toString();
+  };
+
+  userWithDetails._id = convertId(userWithDetails._id);
+
+  userWithDetails.pets = userWithDetails.pets.map((item: any) => ({
+    ...item,
+    _id: convertId(item._id),
+  }));
+
+  return userWithDetails;
+}
+
+@Patch("/current/edit") 
+@Authorized()
+async patchCurrentEdit(@CurrentUser() currentUser: IUsers,
+
+) {
+
 }
 
 @Post("/current/pets/add")
 @Authorized()
-async addCurrentPets(@CurrentUser() currentUser: IUsers,
-  @Body() body: { species: string; title: string; name: string; birthday: string; sex: string; imgURL: string }) {
-
+async addCurrentPets(
+  @CurrentUser() currentUser: IUsers,
+  @Body() body: { 
+    species: string; 
+    title: string; 
+    name: string; 
+    birthday: string; 
+    sex: string; 
+    imgURL: string;
+  }
+) {
   try {
     const { name, species, title, birthday, sex, imgURL } = body;
     const userId = currentUser?._id;
@@ -167,35 +205,77 @@ async addCurrentPets(@CurrentUser() currentUser: IUsers,
     if (!userId) {
       throw new ApiError(400, { message: "User ID is missing" });
     }
-    console.log("User ID:", userId);
 
-    const newPet = await Pet.create({
+  
+    const parsedBirthday = new Date(birthday);
+    if (isNaN(parsedBirthday.getTime())) {
+      throw new ApiError(400, { message: "Invalid birthday format" });
+    }
+
+    const newPet = new Pet({
       name,
       species,
-      birthday,
-      sex,
       title,
+      birthday: parsedBirthday,
+      sex,
       imgURL,
       owner: userId,
     });
 
-    console.log("User ID:", userId);
-    console.log("Created Pet:", newPet);
+    await newPet.save().catch(err => {
+      return new ApiError(500, { message: "Error saving pet" });
+    });
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $push: { pets: newPet._id } },
-      { new: true } 
-    ).exec();
+    await User.findByIdAndUpdate(userId, { $push: { pets: newPet._id } });
 
-    if (!user) {
-      throw new ApiError(404, { message: "User not found" });
+    return new ApiResponse(true, { message: "Pet added successfully", data: newPet.toObject() });
+
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(500, { message: "Internal server error" });
+  }
+}
+
+@Delete("/current/pets/remove/:id")
+@Authorized()
+async removeCurrentPets(
+  @Param('id') id: string,
+  @CurrentUser() user: IUsers,
+) {
+  try {
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ApiError(400, { message: "Invalid ID format" });
     }
 
-    return new ApiResponse(true, { message: "Pet added successfully", pet: newPet });
+    const removePets = await Pet.findById(id).lean();
+    
+    if (!removePets) {
+      throw new ApiError(404, { message: "Pet not found" });
+    }
+
+    const isPetInList = user.pets.some((pet) => pet.toString() === id);
+
+    if (!isPetInList) {
+      throw new ApiError(404, { message: "Pet not linked to user" });
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { $pull: { pets: id } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      throw new ApiError(404, { message: "User not found or pet not linked" });
+    }
+
+    await Pet.findByIdAndDelete(id);
+
+    return new ApiResponse(true, { message: "Removed from pets", data: removePets });
+
   } catch (error) {
-    console.error("Error adding pet:", error);
-    return new ApiError(500, { message: "Something went wrong" });
+    return new ApiError(500, { message: error.message || "Internal server error" });
   }
 }
 

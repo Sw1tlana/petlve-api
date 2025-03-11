@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { IPets } from "../pets/Pets.types";
 
 const PetsSchema = new mongoose.Schema({
+    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
     species: { type: String, required: true },
     title: { type: String, required: true },
     name: { type: String, required: true },
