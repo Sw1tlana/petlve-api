@@ -1,6 +1,7 @@
 import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import mongoose, { Types } from "mongoose";
 
 import { User } from "app/domain/models/User.model";
 import { CreateUsers } from "../domain/dto/CreateUsers.dto";
@@ -9,7 +10,13 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "app/domain/users/Users.types";
 import { Pet } from "app/domain/models/Pets.model";
-import mongoose, { ObjectId, Types } from "mongoose";
+
+const convertId = (id: any) => {
+  if (id?.buffer?.data) {
+    return new Types.ObjectId(Buffer.from(id.buffer.data)).toString();
+  }
+  return id?.toString() || null;
+};
 
 @JsonController("/users")
 export class UsersController {
@@ -28,9 +35,11 @@ export class UsersController {
 
       return new ApiResponse(true, { 
         message: "User successfully created", 
-        user: savedUser.toObject() 
-    });
-
+        user: {
+          ...savedUser.toObject(),
+          _id: convertId(savedUser._id)
+        }
+      });
     } catch (error) {
       return new ApiError(500, { message: "Validation failed" });
     }
@@ -70,7 +79,7 @@ export class UsersController {
         token, 
         refreshToken,
         user: {
-          _id: user._id,
+          _id: convertId(user._id),
           email: user.email,
         }
       });
@@ -160,18 +169,12 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
     throw new Error("User not found");
   }
 
-  const convertId = (id: any) => {
-    if (id && id.buffer) {
-      return new Types.ObjectId(id.buffer.data).toString();
-    }
-    return id.toString();
-  };
-
   userWithDetails._id = convertId(userWithDetails._id);
 
   userWithDetails.pets = userWithDetails.pets.map((item: any) => ({
     ...item,
     _id: convertId(item._id),
+    owner: item.owner ? convertId(item.owner) : null,
   }));
 
   return userWithDetails;
@@ -180,9 +183,28 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
 @Patch("/current/edit") 
 @Authorized()
 async patchCurrentEdit(@CurrentUser() currentUser: IUsers,
-
+@Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
 ) {
+try {
+  const updatedUser = await User.findByIdAndUpdate(currentUser._id, userData, { new: true }).lean();
 
+  if (!updatedUser) {
+    return new ApiError(404, { message: "User not found" });
+  }
+
+  return new ApiResponse(true, { 
+    message: "User updated successfully", 
+    user: {
+      ...updatedUser,
+      _id: convertId(updatedUser._id),
+      noticesFavorites: updatedUser.noticesFavorites.map(convertId),
+      pets: updatedUser.pets.map(convertId)
+    }
+  });
+
+} catch(error) {
+  return new ApiError(500, { message: "Failed to update user" });
+}
 }
 
 @Post("/current/pets/add")
@@ -228,7 +250,14 @@ async addCurrentPets(
 
     await User.findByIdAndUpdate(userId, { $push: { pets: newPet._id } });
 
-    return new ApiResponse(true, { message: "Pet added successfully", data: newPet.toObject() });
+    return new ApiResponse(true, { 
+      message: "Pet added successfully", 
+      data: {
+        ...newPet.toObject(),
+        _id: convertId(newPet._id),
+        owner: convertId(newPet.owner)
+      }
+    });
 
   } catch (error) {
     console.error(error);
@@ -272,7 +301,14 @@ async removeCurrentPets(
 
     await Pet.findByIdAndDelete(id);
 
-    return new ApiResponse(true, { message: "Removed from pets", data: removePets });
+    return new ApiResponse(true, { 
+      message: "Removed from pets", 
+      data: {
+        ...removePets,
+        _id: convertId(removePets._id),
+        owner: convertId(removePets.owner)
+      }
+    });
 
   } catch (error) {
     return new ApiError(500, { message: error.message || "Internal server error" });

@@ -1,16 +1,15 @@
 import { Tcp } from "./Tcp";
 import connectDB from "../helpers/db";
 
-import { IService } from "types/services";
-
-export class App implements IService {
+export class App  {
   private static instance: App;
+  private tcp: Tcp;
 
-  private tcp: IService = new Tcp();
 
   constructor() {
     if (!App.instance) {
       App.instance = this;
+      this.tcp = new Tcp();
     }
 
     return App.instance;
@@ -21,7 +20,7 @@ export class App implements IService {
     console.log("App started");
 
     await connectDB();
-    await tcp.init();
+    await this.tcp.init();
 
     return true;
   }

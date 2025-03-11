@@ -4,7 +4,6 @@ import { useExpressServer, Action } from "routing-controllers";
 import jwt from "jsonwebtoken";
 
 // Імпортуємо наш інтерфейс сервісу і контролери
-import { IService } from "types/services";
 import { authorizationChecker } from "../utils/authorizationChecker";
 import { HTTPRequestLogger } from "../app/middlewares/HTTPRequestLogger"; 
 import { HTTPResponseLogger } from "../app/middlewares/HTTPResponseLogger";
@@ -16,7 +15,7 @@ import { CitiesController } from "app/controllers/CitiesController";
 import { User } from "../app/domain/models/User.model";
 
 // Оголошуємо клас Tcp, який реалізує інтерфейс IService
-export class Tcp implements IService {
+export class Tcp {
   private static instance: Tcp; // Ссылка на единственный экземпляр класса
 
   private routePrefix = "/api"; // Префикс для маршрутов API
