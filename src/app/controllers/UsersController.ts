@@ -33,12 +33,25 @@ export class UsersController {
       const newUser = new User({ ...body, password: passwordHash });
       const savedUser = await newUser.save();
 
-      return new ApiResponse(true, { 
-        message: "User successfully created", 
+      const token = jwt.sign({ id: savedUser._id, email: savedUser.email }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      const refreshToken = jwt.sign({ id: savedUser._id },process.env.REFRESH_SECRET_KEY, {
+        expiresIn: "7d",
+      });
+
+   
+      await savedUser.save(); 
+
+      return new ApiResponse(true, {
+        message: "User successfully created",
         user: {
           ...savedUser.toObject(),
-          _id: convertId(savedUser._id)
-        }
+          _id: convertId(savedUser._id), // перетворення _id в рядок
+        },
+        token,
+        refreshToken,
       });
     } catch (error) {
       return new ApiError(500, { message: "Validation failed" });
