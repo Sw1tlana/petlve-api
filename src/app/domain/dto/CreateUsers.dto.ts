@@ -21,5 +21,14 @@ export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @IsArray()
   @IsOptional() 
   pets: Types.ObjectId[] = [];
+
+  @IsOptional()
+  @IsString()
+  token?: string;
+
+  @IsOptional()
+  @IsString()
+  refreshToken?: string;
+
 }
 

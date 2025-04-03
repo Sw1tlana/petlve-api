@@ -30,25 +30,30 @@ export class UsersController {
       }
       const passwordHash = await bcrypt.hash(body.password, 10);
 
-      const newUser = new User({ ...body, password: passwordHash });
-      const savedUser = await newUser.save();
-
-      const token = jwt.sign({ id: savedUser._id, email: savedUser.email }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: body.email}, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
 
-      const refreshToken = jwt.sign({ id: savedUser._id },process.env.REFRESH_SECRET_KEY, {
+      const refreshToken = jwt.sign({ id: body.email},process.env.REFRESH_SECRET_KEY, {
         expiresIn: "7d",
       });
 
-   
-      await savedUser.save(); 
+      const newUser = new User({ 
+        ...body, 
+        password: passwordHash, 
+        token, 
+        refreshToken 
+      });
+      await newUser.save();
+      
 
+      const savedUser = await newUser.save();
+  
       return new ApiResponse(true, {
         message: "User successfully created",
         user: {
-          ...savedUser.toObject(),
-          _id: convertId(savedUser._id), // перетворення _id в рядок
+          ...savedUser!.toObject(),
+          _id: convertId(savedUser!._id), 
         },
         token,
         refreshToken,
