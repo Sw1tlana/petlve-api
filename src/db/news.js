@@ -1,92 +1,72 @@
 [
   {
-    "_id": "658b694505a6bcd9b9379466",
-    "imgUrl": "https://source.unsplash.com/featured/?dog,luxury",
-    "title": "What I Learned Dogsitting for New York City’s Opulent Elite",
-    "text": "In a city of yawning class inequality, some side hustles let you glimpse how the other half lives.",
-    "date": "2023-04-11T09:00:18+0000",
-    "url": "https://www.nytimes.com/2023/04/11/magazine/dogsitting-rich-new-york.html",
-    "id": "nyt://article/8d29f1fc-d146-509d-8ceb-5a5b17d7886b"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVXWSv95ANhm_45bhqFuPNhWlTkO25JLydlA&s",
+    "title": "Karl Lagerfeld's cat has a new friend",
+    "text": "Choupette, the famous cat of the late designer Karl Lagerfeld, now has a new companion — a rescued stray cat from Guadeloupe.",
+    "date": "April 8, 2025",
+    "url": "https://www.thetimes.co.uk/article/karl-lagerfelds-pampered-cat-has-a-new-playmate-7x7l9g7h9"
   },
   {
-    "_id": "658b694505a6bcd9b9379467",
-    "imgUrl": "https://source.unsplash.com/featured/?vet,technology",
-    "title": "The Virtual Vet Will See You Meow",
-    "text": "Veterinary telemedicine could help more pet owners access much-needed care and put anxious animals at ease, but challenges remain.",
-    "date": "2023-04-07T09:00:46+0000",
-    "url": "https://www.nytimes.com/2023/04/07/health/vet-pet-health-telemedicine.html",
-    "id": "nyt://article/992f2f7f-793c-5553-b722-348625f53a4b"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyrO2r242gZEHeoZye8XcyyqKLZ5mZqqwhzw&s",
+    "title": "Missing cat found four months later in a different country",
+    "text": "A cat named Luna was found in Inverness, Scotland, four months after disappearing from home in Darlington, England.",
+    "date": "April 8, 2025",
+    "url": "https://people.com/missing-pet-cat-found-four-months-later-in-different-country-11710821"
   },
   {
-    "_id": "658b694505a6bcd9b9379468",
-    "imgUrl": "https://source.unsplash.com/featured/?space,exploration",
-    "title": "A New Era of Space Exploration Begins",
-    "text": "Private companies and international collaborations are shaping the future of space travel.",
-    "date": "2023-03-30T08:45:30+0000",
-    "url": "https://www.nytimes.com/2023/03/30/science/space-exploration.html",
-    "id": "nyt://article/23abcd12-3456-7890-abcd-ef1234567890"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSThfzRwGO6hMSXp7PJ4yEOQZG6HBovIV87Bg&s",
+    "title": "Scientists resurrect extinct dire wolves",
+    "text": "Colossal Biosciences successfully conducted the first-ever 'de-extinction' procedure, bringing dire wolves back to life through genetic engineering.",
+    "date": "April 8, 2025",
+    "url": "https://www.thesun.ie/tech/15013192/dire-wolves-deextinction-species-colossal/"
   },
   {
-    "_id": "658b694505a6bcd9b9379469",
-    "imgUrl": "https://source.unsplash.com/featured/?pasta,cooking",
-    "title": "The Secret to Perfect Homemade Pasta",
-    "text": "Chefs share their tips for making restaurant-quality pasta at home.",
-    "date": "2023-03-25T10:15:50+0000",
-    "url": "https://www.nytimes.com/2023/03/25/food/homemade-pasta-tips.html",
-    "id": "nyt://article/45bcde67-8901-2345-fghi-67890abcdefg"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgxDExhWX_qXfWKmdpb728BXPmsuzWwuOJuQ&s",
+    "title": "Flea treatments for pets pollute marine harbors",
+    "text": "A study showed that flea insecticides used for pets are polluting protected marine harbors on the southern coast of England.",
+    "date": "April 8, 2025",
+    "url": "https://www.thetimes.co.uk/article/flea-treatments-pets-chichester-and-langstone-harbours-0gj65b5cl"
   },
   {
-    "_id": "658b694505a6bcd9b9379470",
-    "imgUrl": "https://source.unsplash.com/featured/?travel,nature",
-    "title": "Hidden Travel Gems Around the World",
-    "text": "Explore lesser-known travel destinations that offer unique experiences.",
-    "date": "2023-03-20T07:30:25+0000",
-    "url": "https://www.nytimes.com/2023/03/20/travel/hidden-gems.html",
-    "id": "nyt://article/67def890-1234-5678-abcd-0987654321ef"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN60tUCchyWR-8tbRcELxLx5_-bgmBwOh5yg&s",
+    "title": "Latest trends and updates in the pet world",
+    "text": "An overview of the latest news, including lost pet returns, pet food recalls, and interesting animal stories.",
+    "date": "April 8, 2025",
+    "url": "https://trending.pet/"
   },
   {
-    "_id": "658b694505a6bcd9b9379471",
-    "imgUrl": "https://source.unsplash.com/featured/?AI,technology",
-    "title": "The Rise of AI in Everyday Life",
-    "text": "Artificial intelligence is increasingly integrated into daily routines, raising new opportunities and challenges.",
-    "date": "2023-03-15T12:00:00+0000",
-    "url": "https://www.nytimes.com/2023/03/15/technology/ai-daily-life.html",
-    "id": "nyt://article/abcdef12-3456-7890-abcd-ef1234567890"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiO_ZNsVic6qbp3UH9i3HzVaGPVfEf8MxkMQ&s",
+    "title": "Latest trends and updates in the pet world",
+    "text": "A roundup of news on pet product innovations, including smart devices, eco-friendly products, and personalized items.",
+    "date": "April 8, 2025",
+    "url": "https://www.dailypaws.in/pet-news-trends-updates/"
   },
   {
-    "_id": "658b694505a6bcd9b9379472",
-    "imgUrl": "https://source.unsplash.com/featured/?economy,finance",
-    "title": "Global Economy in 2023: What to Expect",
-    "text": "Experts weigh in on inflation, job markets, and economic growth for the year ahead.",
-    "date": "2023-02-28T08:30:00+0000",
-    "url": "https://www.nytimes.com/2023/02/28/business/global-economy-2023.html",
-    "id": "nyt://article/12345678-abcd-5678-efgh-9876543210ab"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwOfiv03MQe4BijOSwSPn47jZjdNv7YVqpag&s",
+    "title": "Pet of the week: The singing dog",
+    "text": "A rescue dog named Bandit earned the title of pet of the week due to its love for classical music.",
+    "date": "April 8, 2025",
+    "url": "https://www.newsweek.com/pet-of-the-week"
   },
   {
-    "_id": "658b694505a6bcd9b9379473",
-    "imgUrl": "https://source.unsplash.com/featured/?climate,wildlife",
-    "title": "How Climate Change Is Affecting Wildlife",
-    "text": "Rising temperatures and habitat loss are putting many species at risk.",
-    "date": "2023-02-15T10:00:00+0000",
-    "url": "https://www.nytimes.com/2023/02/15/environment/climate-change-wildlife.html",
-    "id": "nyt://article/87654321-abcd-1234-efgh-567890abcdef"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIR-11cg2534IW2flxtySWVnvCTScZV9ot_g&s",
+    "title": "Latest news and articles about pets",
+    "text": "A roundup of news, including approval of lab-grown pet food in the UK and other important updates.",
+    "date": "April 8, 2025",
+    "url": "https://www.newsbytesapp.com/news/lifestyle/pets"
   },
   {
-    "_id": "658b694505a6bcd9b9379474",
-    "imgUrl": "https://source.unsplash.com/featured/?sports,technology",
-    "title": "The Evolution of Modern Sports",
-    "text": "How technology and analytics are changing the way athletes train and compete.",
-    "date": "2023-01-30T07:45:00+0000",
-    "url": "https://www.nytimes.com/2023/01/30/sports/modern-sports-evolution.html",
-    "id": "nyt://article/54321098-abcd-9876-efgh-6543210abcdef"
+    "imgUrl": "https://daytoday.ua/wp-content/uploads/2020/10/Vsesvitniy-den-domashnikh-tvaryn.jpg",
+    "title": "Training and health tips for your pets",
+    "text": "Recommendations for puppy training, crate training, social skill development, and other useful tips.",
+    "date": "April 8, 2025",
+    "url": "https://www.petnewsdirect.com/"
   },
   {
-    "_id": "658b694505a6bcd9b9379475",
-    "imgUrl": "https://source.unsplash.com/featured/?music,streaming",
-    "title": "The Future of Music Streaming",
-    "text": "New trends and business models are shaping the way we listen to music.",
-    "date": "2023-01-10T09:15:00+0000",
-    "url": "https://www.nytimes.com/2023/01/10/culture/music-streaming-future.html",
-    "id": "nyt://article/09876543-abcd-6543-efgh-210987654321"
+    "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEKsDN58EGQWTayar9q-_ypVca23aurfuOMA&https://nrv.org.ua/wp-content/uploads/2021/11/cef58a03ea36e2cf0c1c5e4a5f1735721.jpg",
+    "title": "Latest pet news from ABC News",
+    "text": "A roundup of news, including cases of cats contracting bird flu and other current topics.",
+    "date": "April 8, 2025",
+    "url": "https://abcnews.go.com/alerts/pets"
   }
 ]
