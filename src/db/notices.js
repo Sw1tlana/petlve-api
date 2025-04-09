@@ -1,6 +1,5 @@
  [
       {
-        "_id": "6589436d05a6bcd9b9379420",
         "species": "dog",
         "category": "found",
         "price": 150,
@@ -17,7 +16,6 @@
         "updatedAt": "2023-12-25T11:41:12.493Z"
       },
       {
-        "_id": "6589436d05a6bcd9b9379421",
         "species": "cat",
         "category": "sell",
         "price": 100,
@@ -33,7 +31,6 @@
         "popularity": 3
       },
       {
-        "_id": "6589436d05a6bcd9b9379422",
         "species": "monkey",
         "category": "found",
         "price": 200,
@@ -49,7 +46,6 @@
         "popularity": 4
       },
       {
-        "_id": "6589436d05a6bcd9b9379423",
         "species": "bird",
         "category": "sell",
         "price": 50,
@@ -65,9 +61,9 @@
         "popularity": 5
       },
       {
-        "_id": "6589436d05a6bcd9b9379424",
         "species": "snake",
         "category": "free",
+        "price": 60,
         "title": "Pet Snake Looking for a Home",
         "name": "Slither",
         "birthday": "2022-03-11",
@@ -77,12 +73,12 @@
         "imgURL": "https://ftp.goit.study/img/pets/5.webp",
         "createdAt": "2023-12-15T15:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94225",
-        "popularity": 2
+        "popularity": 3
       },
       {
-        "_id": "6589436d05a6bcd9b9379425",
         "species": "turtle",
         "category": "free",
+        "price": 80,
         "title": "Rescue Turtle Needs a Home",
         "name": "Shelly",
         "birthday": "2018-07-22",
@@ -92,10 +88,9 @@
         "imgURL": "https://ftp.goit.study/img/pets/6.webp",
         "createdAt": "2023-12-16T16:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94226",
-        "popularity": 3
+        "popularity": 6
       },
       {
-        "_id": "6589436d05a6bcd9b9379426",
         "species": "lizard",
         "category": "sell",
         "price": 40,
@@ -108,10 +103,9 @@
         "imgURL": "https://ftp.goit.study/img/pets/7.webp",
         "createdAt": "2023-12-17T17:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94227",
-        "popularity": 4
+        "popularity": 9
       },
       {
-        "_id": "6589436d05a6bcd9b9379427",
         "species": "frog",
         "category": "found",
         "price": 20,
@@ -124,12 +118,12 @@
         "imgURL": "https://ftp.goit.study/img/pets/8.webp",
         "createdAt": "2023-12-18T18:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94228",
-        "popularity": 2
+        "popularity": 4
       },
       {
-        "_id": "6589436d05a6bcd9b9379428",
         "species": "fish",
         "category": "free",
+        "price": 100,
         "title": "Beautiful Betta Fish",
         "name": "Splash",
         "birthday": "2021-04-05",
@@ -139,13 +133,12 @@
         "imgURL": "https://ftp.goit.study/img/pets/9.webp",
         "createdAt": "2023-12-19T19:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94229",
-        "popularity": 1
+        "popularity": 7
       },
       {
-        "_id": "6589436d05a6bcd9b9379429",
         "species": "ants",
         "category": "found",
-        "price": 5,
+        "price": 50,
         "title": "Ant Colony for Sale",
         "name": "Antonia",
         "birthday": "2023-03-01",
@@ -155,10 +148,9 @@
         "imgURL": "https://ftp.goit.study/img/pets/10.webp",
         "createdAt": "2023-12-20T20:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94230",
-        "popularity": 2
+        "popularity": 8
       },
       {
-        "_id": "6589436d05a6bcd9b9379430",
         "species": "bees",
         "category": "lost",
         "price": 10,
@@ -171,13 +163,12 @@
         "imgURL": "https://ftp.goit.study/img/pets/11.webp",
         "createdAt": "2023-12-21T21:00:00.000Z",
         "user": "6576e7d0c4cc99fc5ef94231",
-        "popularity": 3
+        "popularity": 12
       },
       {
-        "_id": "6589436d05a6bcd9b9379431",
         "species": "butterfly",
         "category": "lost",
-        "price": 5,
+        "price": 120,
         "title": "Colorful Butterfly",
         "name": "Flare",
         "birthday": "2023-06-25",
@@ -185,6 +176,7 @@
         "sex": "unknown",
         "location": "641ffcc3ae4e889a02d25ca8",
         "imgURL": "https://ftp.goit.study/img/pets/12.webp",
-        "createdAt": "2023-12-22T22:00:00.000Z"
+        "createdAt": "2023-12-22T22:00:00.000Z",
+        "popularity": 10
       }
     ]
