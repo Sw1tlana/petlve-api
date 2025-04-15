@@ -105,9 +105,10 @@ async getSpecies() {
 }
 
 @Delete("/favorites/remove/:id")
-    async deleteNoticeFavorites(@Param('id') id: string,
+    async deleteNoticeFavorites(@Param('id') rawId: any, id: string,
     @CurrentUser() user: IUsers) {
   try {
+    const id = typeof rawId === 'string' ? rawId : rawId.toString();
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return new ApiError(400, { message: "Invalid ID format" });
