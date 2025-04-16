@@ -146,7 +146,8 @@ async deleteNoticeFavorites(
 
     const favoriteCleaned = {
       ...removeFavorite,
-      _id: removeFavorite._id.toString(),
+      _id: removeFavorite._id?.toString?.(),
+      user: removeFavorite.user?.toString?.(),
     };
 
     return new ApiResponse(true, {
@@ -155,7 +156,6 @@ async deleteNoticeFavorites(
     });
 
   } catch (error) {
-    console.error("Error in deleteNoticeFavorites:", error);
     return new ApiError(500, { message: "Internal server error" });
   }
 }
