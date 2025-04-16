@@ -73,43 +73,50 @@ async getSpecies() {
 }
 
 @Post("/favorites/add/:id")
-    @Authorized() 
-    async addNoticeFavorites(@Param('id') id: string,
-    @CurrentUser() user: IUsers) {
-
+@Authorized() 
+async addNoticeFavorites(
+  @Param('id') id: string,
+  @CurrentUser() user: IUsers
+) {
   try {
-    console.log(`Received request to add notice ${id} to favorites`);
+
     const favorite = await Notice.collection.findOne({ _id: new mongoose.Types.ObjectId(id) });
 
     if (!favorite) {
-        console.log(`Notice with id ${id} not found.`);
-        return new ApiError(404, { message: "Notice not found" });
+      return new ApiError(404, { message: "Notice not found" });
     }
-    console.log(`Found notice:`, favorite);
+
+    const favoriteCleaned = {
+      ...favorite,
+      _id: favorite._id.toString(), 
+    };
+
     const isAlreadyFavorite = user.noticesFavorites.some(
-        (favId) => favId.toString() === id
-      );
-      console.log(`User's current favorite notices:`, user.noticesFavorites);
-      console.log(`Is the notice already in favorites? ${isAlreadyFavorite}`)
-  
-      if (isAlreadyFavorite) {
-        return new ApiResponse(true, { message: "Already in favorites" });
-      }
+      (favId) => favId.toString() === id
+    );
 
-      await User.findByIdAndUpdate(user._id, {
-        $push: { noticesFavorites: id },
-      });
-  
+    if (isAlreadyFavorite) {
+      return new ApiResponse(true, { message: "Already in favorites" });
+    }
 
-      return new ApiResponse(true, { message: "Added to favorites",  favorite });
+    await User.findByIdAndUpdate(user._id, {
+      $push: { noticesFavorites: id },
+    });
+
+    return new ApiResponse(true, {
+      message: "Added to favorites",
+      favorite: favoriteCleaned,
+    });
 
   } catch (error) {
-      return new ApiError(500, { message: "Internal server error" });
+    return new ApiError(500, { message: "Internal server error" });
   }
 }
 
 @Delete("/favorites/remove/:id")
-async deleteNoticeFavorites(@Param('id') rawId: any, @CurrentUser() user: IUsers) {
+async deleteNoticeFavorites(@Param('id') rawId: any, 
+@CurrentUser() user: IUsers) {
+
   try {
     const id = typeof rawId === 'string' ? rawId : rawId.toString();
 
@@ -127,16 +134,19 @@ async deleteNoticeFavorites(@Param('id') rawId: any, @CurrentUser() user: IUsers
       $pull: { noticesFavorites: id }
     });
 
-    const removeFavorite = await Notice.findById(id).lean();
+    const removeFavorite = await Notice.collection.findOne({ _id: new mongoose.Types.ObjectId(id) }); 
 
     if (!removeFavorite) {
       return new ApiError(404, { message: "Notice not found" });
     }
+    const favoriteCleaned = {
+      ...removeFavorite,
+      _id: removeFavorite._id.toString(),  
+    };
 
-    return new ApiResponse(true, { message: "Removed from favorites", data: removeFavorite });
+    return new ApiResponse(true, { message: "Removed from favorites", data: favoriteCleaned });
 
   } catch (error) {
-    console.error("Error while deleting from favorites:", error);
     return new ApiError(500, { message: "Internal server error" });
   }
 }
