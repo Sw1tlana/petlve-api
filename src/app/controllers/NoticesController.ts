@@ -120,11 +120,13 @@ async deleteNoticeFavorites(
   @CurrentUser() user: IUsers
 ) {
   try {
-    const id = typeof rawId === 'string' ? rawId : rawId.toString();
+    const id = mongoose.Types.ObjectId.isValid(rawId) 
+    ? new mongoose.Types.ObjectId(rawId).toString()
+    : null;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return new ApiError(400, { message: "Invalid ID format" });
-    }
+  if (!id) {
+    return new ApiError(400, { message: "Invalid ID format" });
+  }
 
     const isFavorite = user.noticesFavorites.some(
       (favId) => favId.toString() === id
