@@ -88,7 +88,8 @@ async addNoticeFavorites(
 
     const favoriteCleaned = {
       ...favorite,
-      _id: favorite._id.toString(), 
+      _id: favorite._id.toString(),
+      user: favorite.user?.toString?.(), 
     };
 
     const isAlreadyFavorite = user.noticesFavorites.some(
