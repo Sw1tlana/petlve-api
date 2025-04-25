@@ -12,11 +12,19 @@ export class NoticesController {
     async getNotices() {
         try {
         const notices = await Notice.find().lean();
-        return new ApiResponse(true, notices);
+        
+    const transformed = notices.map((notice) => ({
+      ...notice,
+      _id: notice._id?.toString?.(),
+      user: notice.user?.toString?.(),
+      location: notice.location?.toString?.(), 
+    }));
+    
+        return new ApiResponse(true, transformed);
         }catch(error) {
             return new ApiError(400, { message: "Validation failed"});
         }
-}
+};
 
 @Get("/categories")
 async getCategories() {
@@ -28,7 +36,7 @@ async getCategories() {
         console.error("Error fetching categories:", error);
         return new ApiError(500, { message: error.message || "Internal Server Error" });
     }
-}
+};
 
 @Get("/sex")
 async getSex() {
@@ -44,7 +52,7 @@ async getSex() {
         console.error("Error fetching sex notices:", error); 
         return new ApiError(400, { message: "Validation failed"});
     }
-}
+};
 
 @Get("/species")
 async getSpecies() {
@@ -54,7 +62,7 @@ async getSpecies() {
     }catch(error) {
         return new ApiError(400, { message: "Validation failed"});
     }
-}
+};
 
     @Get("/:id")
     async getNoticesById(@Param('id') id: string) {
@@ -70,7 +78,7 @@ async getSpecies() {
   } catch (error) {
       return new ApiError(500, { message: "Internal server error" });
   }
-}
+};
 
 @Post("/favorites/add/:id")
 @Authorized() 
@@ -112,7 +120,7 @@ async addNoticeFavorites(
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
   }
-}
+};
 
 @Delete("/favorites/remove/:id")
 @Authorized()
@@ -161,7 +169,7 @@ async deleteNoticeFavorites(
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
   }
-}
+};
 
 
-}
+};
