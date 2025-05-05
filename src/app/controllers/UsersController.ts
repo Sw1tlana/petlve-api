@@ -169,7 +169,7 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
   }
-}
+};
 
 @Get("/current/full") 
 @Authorized()
@@ -191,34 +191,53 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
   }));
 
   return userWithDetails;
-}
+};
 
-@Patch("/current/edit") 
+@Patch("/current/edit")
 @Authorized()
-  async patchCurrentEdit(@CurrentUser() currentUser: IUsers,
+async patchCurrentEdit(
+  @CurrentUser() currentUser: IUsers,
   @Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
 ) {
-try {
-  const updatedUser = await User.findByIdAndUpdate(currentUser._id, userData, { new: true }).lean();
+  try {
+    const updatedUser = await User.findByIdAndUpdate(currentUser._id, userData, { new: true });
 
-  if (!updatedUser) {
-    return new ApiError(404, { message: "User not found" });
-  }
-
-  return new ApiResponse(true, { 
-    message: "User updated successfully", 
-    user: {
-      ...updatedUser,
-      _id: convertId(updatedUser._id),
-      noticesFavorites: updatedUser.noticesFavorites.map(convertId),
-      pets: updatedUser.pets.map(convertId)
+    if (!updatedUser) {
+      return new ApiError(404, { message: "User not found" });
     }
-  });
 
-} catch(error) {
-  return new ApiError(500, { message: "Failed to update user" });
-}
-}
+    const token = jwt.sign(
+      { id: updatedUser._id.toString(), name: updatedUser.name },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: updatedUser._id.toString() },
+      process.env.JWT_SECRET!,
+      { expiresIn: "3d" }
+    );
+
+    updatedUser.token = token;
+    updatedUser.refreshToken = refreshToken;
+    await updatedUser.save();
+
+    return new ApiResponse(true, {
+      message: "User updated successfully",
+      user: {
+        ...updatedUser.toObject(),
+        _id: convertId(updatedUser._id),
+        noticesFavorites: updatedUser.noticesFavorites.map(convertId),
+        pets: updatedUser.pets.map(convertId),
+        token,
+        refreshToken
+      }
+    });
+
+  } catch (error) {
+    return new ApiError(500, { message: "Failed to update user" });
+  }
+};
 
 @Post("/current/pets/add")
 @Authorized()

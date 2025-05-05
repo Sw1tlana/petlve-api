@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
+  avatar: { type: String, default: "" },
   token: { type: String, default: null },
   refreshToken: { type: String, default: null },
   noticesFavorites: [{ type: Schema.Types.ObjectId, ref: "Notice" }],
