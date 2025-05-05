@@ -6,6 +6,7 @@ export interface IUsers {
   email: string;
   phone: string;
   password: string;
+  avatar?: string;
   token?: string;
   refreshToken?: string;
   noticesFavorites: Types.ObjectId[];

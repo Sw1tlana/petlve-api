@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch } from "routing-controllers";
+import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch, UseBefore } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose, { Types } from "mongoose";
@@ -10,6 +10,7 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
+import { upload } from "app/middlewares/uploads";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
@@ -61,7 +62,7 @@ export class UsersController {
     } catch (error) {
       return new ApiError(500, { message: "Validation failed" });
     }
-  }
+  };
 
 
   @Post("/signin")
@@ -195,6 +196,7 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
 
 @Patch("/current/edit")
 @Authorized()
+@UseBefore(upload.single("avatar")) 
 async patchCurrentEdit(
   @CurrentUser() currentUser: IUsers,
   @Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
