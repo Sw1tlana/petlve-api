@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import { Request } from "express";
+import fs from 'fs';
 
 const uploadDir = path.join(__dirname, "..", "uploads");
 
@@ -21,6 +21,10 @@ const storage = multer.diskStorage({
 });
 
 export const upload = multer({ storage });
+
+export interface MulterRequest extends Request {
+  file: Express.Multer.File;
+}
 
 export interface MulterRequest extends Request {
   file: Express.Multer.File;

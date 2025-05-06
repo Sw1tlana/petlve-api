@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch, UseBefore } from "routing-controllers";
+import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch, UseBefore, Req } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose, { Types } from "mongoose";
@@ -10,13 +10,19 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
-import { upload } from "app/middlewares/uploads";
+import { MulterRequest, upload } from "app/middlewares/uploads";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
     return new Types.ObjectId(Buffer.from(id.buffer.data)).toString();
   }
   return id?.toString() || null;
+};
+
+interface IUserUpdateBody {
+  name?: string;
+  email?: string;
+  phone?: string;
 };
 
 @JsonController("/users")
@@ -199,10 +205,18 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
 @UseBefore(upload.single("avatar")) 
 async patchCurrentEdit(
   @CurrentUser() currentUser: IUsers,
-  @Body() userData: { name?: string; email?: string; phone?: string; avatar?: string }
+  @Req() req: MulterRequest,
+  @Body() body: IUserUpdateBody
 ) {
   try {
-    const updatedUser = await User.findByIdAndUpdate(currentUser._id, userData, { new: true });
+    const updateData: Record<string, any> = { ...body };
+
+    if (req.file) {
+      updateData.avatar = `/uploads/${req.file.filename}`;
+      console.log(updateData);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
 
     if (!updatedUser) {
       return new ApiError(404, { message: "User not found" });

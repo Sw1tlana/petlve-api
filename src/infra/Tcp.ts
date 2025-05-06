@@ -12,6 +12,7 @@ import { FriendsController } from "../app/controllers/FriendsController";
 import { NewsController } from "../app/controllers/NewsController";
 import { CitiesController } from "../app/controllers/CitiesController";
 import { User } from "../app/domain/models/User.model";
+import path from "path";
 
 export class Tcp {
   private static instance: Tcp; 
@@ -66,6 +67,10 @@ export class Tcp {
     const { server, routePrefix } = this;
 
     server.use(express.json());
+
+    const uploadsPath = path.resolve(process.cwd(), "uploads");
+    console.log("Serving uploads from:", uploadsPath); 
+    server.use("/uploads", express.static(uploadsPath));
 
     useExpressServer(server, {
       routePrefix,
