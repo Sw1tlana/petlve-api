@@ -10,7 +10,7 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
-import { MulterRequest, upload } from "app/middlewares/uploads";
+import { MulterRequest, upload } from "../middlewares/uploads";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
