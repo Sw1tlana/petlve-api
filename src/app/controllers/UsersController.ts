@@ -23,6 +23,7 @@ interface IUserUpdateBody {
   name?: string;
   email?: string;
   phone?: string;
+  photoUrl?: string;
 };
 
 @JsonController("/users")
@@ -211,10 +212,11 @@ async patchCurrentEdit(
   try {
     const updateData: Record<string, any> = { ...body };
 
-    if (req.file) {
-      updateData.avatar = `/uploads/${req.file.filename}`;
-      console.log(updateData);
-    }
+  if (req.file) {
+    updateData.avatar = `/uploads/${req.file.filename}`;
+  } else if (body.photoUrl) {
+    updateData.avatar = body.photoUrl;
+  }
 
     const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
 
