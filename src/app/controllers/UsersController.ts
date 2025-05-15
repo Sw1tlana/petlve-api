@@ -103,10 +103,13 @@ export class UsersController {
         message: "Login successful", 
         token, 
         refreshToken,
-        user: {
-          _id: convertId(user._id),
-          email: user.email,
-        }
+          user: {
+            _id: convertId(user._id),
+            name: user.name || null,
+            email: user.email,
+            avatar: user.avatar || null,
+            phone: user.phone || null,
+          }
       });
     } catch (error) {
       return new ApiError(500, { message: "Internal server error" });
