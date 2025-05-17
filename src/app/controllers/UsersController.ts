@@ -26,6 +26,15 @@ interface IUserUpdateBody {
   photoUrl?: string;
 };
 
+interface IUserAddPetBody {
+  name?: string;
+  species?: string;
+  title?: string;
+  birthday?: string;
+  photoUrl?: string;
+  sex?: string;
+};
+
 @JsonController("/users")
 export class UsersController {
   @Post("/signup")
@@ -262,60 +271,65 @@ async patchCurrentEdit(
 
 @Post("/current/pets/add")
 @Authorized()
+@UseBefore(upload.single("photo"))
 async addCurrentPets(
   @CurrentUser() currentUser: IUsers,
-  @Body() body: { 
-    species: string; 
-    title: string; 
-    name: string; 
-    birthday: string; 
-    sex: string; 
-    imgURL: string;
-  }
+  @Req() req: MulterRequest,
+  @Body() body: IUserAddPetBody
 ) {
-  try {
-    const { name, species, title, birthday, sex, imgURL } = body;
+
+ try {
     const userId = currentUser?._id;
 
     if (!userId) {
       throw new ApiError(400, { message: "User ID is missing" });
     }
 
-  
-    const parsedBirthday = new Date(birthday);
-    if (isNaN(parsedBirthday.getTime())) {
-      throw new ApiError(400, { message: "Invalid birthday format" });
+    const updateData: Record<string, any> = { ...body };
+
+    if (req.file) {
+      updateData.photoUrl = `/uploads/${req.file.filename}`;
+    } else if (body.photoUrl) {
+      updateData.photoUrl = body.photoUrl;
+    }
+
+    if (!updateData.photoUrl) {
+      throw new ApiError(400, { message: "Photo is required" });
+    }
+
+    if (updateData.birthday) {
+      const parsedBirthday = new Date(updateData.birthday);
+      if (isNaN(parsedBirthday.getTime())) {
+        throw new ApiError(400, { message: "Invalid birthday format" });
+      }
+      updateData.birthday = parsedBirthday;
     }
 
     const newPet = new Pet({
-      name,
-      species,
-      title,
-      birthday: parsedBirthday,
-      sex,
-      imgURL,
+      ...updateData,
       owner: userId,
     });
 
-    await newPet.save().catch(err => {
-      return new ApiError(500, { message: "Error saving pet" });
+    await newPet.save();
+
+    await User.findByIdAndUpdate(userId, {
+      $push: { pets: newPet._id },
     });
 
-    await User.findByIdAndUpdate(userId, { $push: { pets: newPet._id } });
-
-    return new ApiResponse(true, { 
-      message: "Pet added successfully", 
+    return new ApiResponse(true, {
+      message: "Pet added successfully",
       data: {
         ...newPet.toObject(),
         _id: convertId(newPet._id),
-        owner: convertId(newPet.owner)
-      }
+        owner: convertId(newPet.owner),
+      },
     });
 
   } catch (error) {
+    console.error("Add pet error:", error);
     throw new ApiError(500, { message: "Internal server error" });
   }
-}
+};
 
 @Delete("/current/pets/remove/:id")
 @Authorized()
