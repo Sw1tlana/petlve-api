@@ -322,6 +322,7 @@ async addCurrentPets(
       message: "Pet added successfully",
       data: {
         ...newPet.toObject(),
+        photoUrl: newPet.photo,
         _id: convertId(newPet._id),
         owner: convertId(newPet.owner),
       },
