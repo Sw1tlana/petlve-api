@@ -285,13 +285,15 @@ async addCurrentPets(
       throw new ApiError(400, { message: "User ID is missing" });
     }
 
+ 
     const updateData: Record<string, any> = { ...body };
 
-    if (req.file) {
-      updateData.photo = `/uploads/${req.file.filename}`;
-    } else if (body.photoUrl) {
-      updateData.photo = body.photoUrl;
-    }
+      if (req.file) {
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        updateData.photo = `${baseUrl}/uploads/${req.file.filename}`;
+      } else if (body.photoUrl) {
+        updateData.photo = body.photoUrl;
+      }
 
     if (!updateData.photo) {
       throw new ApiError(400, { message: "Photo is required" });
