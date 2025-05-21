@@ -6,7 +6,7 @@ export interface IPets {
     name: string;
     birthday: string;
     sex: string;
-    imgURL: string;
+    photo: string;
     owner: Types.ObjectId;
 }
 
