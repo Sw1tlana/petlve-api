@@ -31,7 +31,7 @@ interface IUserAddPetBody {
   species?: string;
   title?: string;
   birthday?: string;
-  photoUrl?: string;
+  photo?: string;
   sex?: string;
 };
 
@@ -288,12 +288,12 @@ async addCurrentPets(
     const updateData: Record<string, any> = { ...body };
 
     if (req.file) {
-      updateData.photoUrl = `/uploads/${req.file.filename}`;
-    } else if (body.photoUrl) {
-      updateData.photoUrl = body.photoUrl;
+      updateData.photo = `/uploads/${req.file.filename}`;
+    } else if (body.photo) {
+      updateData.photo = body.photo;
     }
 
-    if (!updateData.photoUrl) {
+    if (!updateData.photo) {
       throw new ApiError(400, { message: "Photo is required" });
     }
 
