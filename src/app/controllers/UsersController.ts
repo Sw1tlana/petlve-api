@@ -299,13 +299,11 @@ async addCurrentPets(
       throw new ApiError(400, { message: "Photo is required" });
     }
 
-    if (updateData.birthday) {
       const parsedBirthday = new Date(updateData.birthday);
+      console.log('parsedBirthday', parsedBirthday);
       if (isNaN(parsedBirthday.getTime())) {
         throw new ApiError(400, { message: "Invalid birthday format" });
       }
-      updateData.birthday = parsedBirthday;
-    }
 
     const newPet = new Pet({
       ...updateData,
