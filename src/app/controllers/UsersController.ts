@@ -31,7 +31,7 @@ interface IUserAddPetBody {
   species?: string;
   title?: string;
   birthday?: string;
-  photo?: string;
+  photoUrl?: string;
   sex?: string;
 };
 
@@ -289,8 +289,8 @@ async addCurrentPets(
 
     if (req.file) {
       updateData.photo = `/uploads/${req.file.filename}`;
-    } else if (body.photo) {
-      updateData.photo = body.photo;
+    } else if (body.photoUrl) {
+      updateData.photo = body.photoUrl;
     }
 
     if (!updateData.photo) {
