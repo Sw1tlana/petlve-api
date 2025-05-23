@@ -316,6 +316,31 @@ async addCurrentPets(
       $push: { pets: newPet._id },
     });
 
+    const updatedUser = await User.findById(userId);
+    if (!updatedUser) {
+      throw new ApiError(404, { message: "User not found" });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new ApiError(500, { message: "JWT_SECRET not defined in env" });
+    }
+
+    const token = jwt.sign(
+      { id: updatedUser._id.toString(), name: updatedUser.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: updatedUser._id.toString() },
+      process.env.JWT_SECRET,
+      { expiresIn: "3d" }
+    );
+
+    updatedUser.token = token;
+    updatedUser.refreshToken = refreshToken;
+    await updatedUser.save();
+
     return new ApiResponse(true, {
       message: "Pet added successfully",
       data: {
@@ -323,9 +348,11 @@ async addCurrentPets(
         photoUrl: newPet.photo,
         _id: convertId(newPet._id),
         owner: convertId(newPet.owner),
+        token,
+        refreshToken,
       },
     });
-
+    
   } catch (error) {
     console.error("Add pet error:", error);
     throw new ApiError(500, { message: "Internal server error" });
