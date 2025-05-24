@@ -277,47 +277,27 @@ async addCurrentPets(
   @Req() req: MulterRequest,
   @Body() body: IUserAddPetBody
 ) {
-
- try {
+  try {
     const userId = currentUser?._id;
 
     if (!userId) {
-      throw new ApiError(400, { message: "User ID is missing" });
+      return new ApiError(400, { message: "User ID is missing" });
     }
 
- 
     const updateData: Record<string, any> = { ...body };
 
-    if (req.file && body.photoUrl) {
-      throw new ApiError(400, {
-        message: "Please provide only one photo source: file or photoUrl",
-      });
-    };
+    console.log("Uploaded file:", req.file);
 
-  if (req.file) {
-    updateData.avatar = `/uploads/${req.file.filename}`;
-  } else if (body.photoUrl) {
-    updateData.avatar = body.photoUrl;
-  }
+    if (req.file && req.file.filename) {
+      updateData.photo = `/uploads/${req.file.filename}`;
+    } else if (body.photoUrl) {
+      updateData.photo = body.photoUrl;
+    }
 
     if (!updateData.photo) {
-      throw new ApiError(400, { message: "Photo is required" });
+      return new ApiError(400, { message: "Photo is required" });
     }
 
-        if (!updateData.birthday) {
-      throw new ApiError(400, { message: "Birthday is required" });
-    }
-
-    const parsedBirthday = new Date(updateData.birthday);
-
-    if (isNaN(parsedBirthday.getTime())) {
-      throw new ApiError(400, {
-        message: "Invalid birthday format. Expected ISO string like 'YYYY-MM-DD' or valid date string.",
-      });
-    }
-
-    updateData.birthday = parsedBirthday;
-    
     const newPet = new Pet({
       ...updateData,
       owner: userId,
@@ -337,10 +317,13 @@ async addCurrentPets(
         owner: convertId(newPet.owner),
       },
     });
-    
+
   } catch (error) {
     console.error("Add pet error:", error);
-    throw new ApiError(500, { message: "Internal server error" });
+    if (error instanceof Error) {
+      console.error(error.stack);
+    }
+    return new ApiError(500, { message: "Internal server error" });
   }
 };
 
