@@ -288,23 +288,36 @@ async addCurrentPets(
  
     const updateData: Record<string, any> = { ...body };
 
-      if (req.file) {
-        const baseUrl = `${req.protocol}://${req.get("host")}`;
-        updateData.photo = `${baseUrl}/uploads/${req.file.filename}`;
-      } else if (body.photoUrl) {
-        updateData.photo = body.photoUrl;
-      }
+    if (req.file && body.photoUrl) {
+      throw new ApiError(400, {
+        message: "Please provide only one photo source: file or photoUrl",
+      });
+    };
+
+  if (req.file) {
+    updateData.avatar = `/uploads/${req.file.filename}`;
+  } else if (body.photoUrl) {
+    updateData.avatar = body.photoUrl;
+  }
 
     if (!updateData.photo) {
       throw new ApiError(400, { message: "Photo is required" });
     }
 
-      const parsedBirthday = new Date(updateData.birthday);
-      console.log('parsedBirthday', parsedBirthday);
-      if (isNaN(parsedBirthday.getTime())) {
-        throw new ApiError(400, { message: "Invalid birthday format" });
-      }
+        if (!updateData.birthday) {
+      throw new ApiError(400, { message: "Birthday is required" });
+    }
 
+    const parsedBirthday = new Date(updateData.birthday);
+
+    if (isNaN(parsedBirthday.getTime())) {
+      throw new ApiError(400, {
+        message: "Invalid birthday format. Expected ISO string like 'YYYY-MM-DD' or valid date string.",
+      });
+    }
+
+    updateData.birthday = parsedBirthday;
+    
     const newPet = new Pet({
       ...updateData,
       owner: userId,
@@ -320,7 +333,6 @@ async addCurrentPets(
       message: "Pet added successfully",
       data: {
         ...newPet.toObject(),
-        photoUrl: newPet.photo,
         _id: convertId(newPet._id),
         owner: convertId(newPet.owner),
       },
