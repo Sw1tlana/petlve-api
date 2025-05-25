@@ -1,4 +1,14 @@
-import { JsonController, Get, Post, Body, Authorized, CurrentUser, Delete, Param, Patch, UseBefore, Req } from "routing-controllers";
+import { JsonController, 
+        Get,
+        Post, 
+        Body, 
+        Authorized, 
+        CurrentUser, 
+        Delete, 
+        Param, 
+        Patch, 
+        UseBefore, 
+        Req } from "routing-controllers";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose, { Types } from "mongoose";
@@ -297,6 +307,13 @@ async addCurrentPets(
     if (!updateData.photo) {
       return new ApiError(400, { message: "Photo is required" });
     }
+
+    if (updateData.birthday) {
+      const now = new Date();
+      const isoString = now.toISOString();
+      updateData.birthday = now;
+    }
+  
 
     const newPet = new Pet({
       ...updateData,

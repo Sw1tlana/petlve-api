@@ -29,6 +29,5 @@ export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @IsOptional()
   @IsString()
   refreshToken?: string;
-
 }
 
