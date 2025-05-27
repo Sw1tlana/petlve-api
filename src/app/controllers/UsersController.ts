@@ -21,6 +21,7 @@ import { validate } from "class-validator";
 import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
 import { MulterRequest, upload } from "../middlewares/uploads";
+import { IPets } from "app/domain/pets/Pets.types";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
@@ -183,18 +184,31 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
 
     const userFromDb = await User.findById(currentUser._id)
       .populate('noticesFavorites') 
+      .populate('pets') 
       .lean(); 
 
     if (!userFromDb) {
       return new ApiError(404, { message: "User not found in database" });
     }
 
-    return new ApiResponse(true, {
-      _id: userFromDb._id.toString(),
-      name: userFromDb.name,
-      email: userFromDb.email,
-      noticesFavorites: userFromDb.noticesFavorites, 
-    });
+const pets = userFromDb?.pets as unknown as IPets[];
+
+return new ApiResponse(true, {
+  _id: userFromDb._id.toString(),
+  name: userFromDb.name,
+  email: userFromDb.email,
+  pets: pets.map(pet => ({
+    _id: pet._id.toString(),
+    species: pet.species,
+    title: pet.title,
+    name: pet.name,
+    birthday: pet.birthday,
+    sex: pet.sex,
+    photo: pet.photo,
+    owner: pet.owner.toString(),
+  })),
+  noticesFavorites: userFromDb.noticesFavorites,
+});
 
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
@@ -294,7 +308,9 @@ async addCurrentPets(
       return new ApiError(400, { message: "User ID is missing" });
     }
 
-    const updateData: Record<string, any> = { ...body };
+    const updateData: Record<string, any> = {
+      ...req.body, 
+    };
 
     console.log("Uploaded file:", req.file);
 
@@ -326,13 +342,27 @@ async addCurrentPets(
       $push: { pets: newPet._id },
     });
 
+
+        const savedPet = await Pet.findById(newPet._id).lean();
+
+    if (!savedPet) {
+      return new ApiError(404, { message: "Pet not found after save" });
+    }
+
+    const { _id, species, title, name, birthday, sex, photo, owner } = savedPet;
+
     return new ApiResponse(true, {
       message: "Pet added successfully",
-      data: {
-        ...newPet.toObject(),
-        _id: convertId(newPet._id),
-        owner: convertId(newPet.owner),
-      },
+        data: {
+          _id: convertId(_id),
+          species,
+          title,
+          name,
+          birthday,
+          sex,
+          photo,
+          owner: convertId(owner),
+        },
     });
 
   } catch (error) {
