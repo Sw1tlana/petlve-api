@@ -312,7 +312,6 @@ async addCurrentPets(
       ...req.body, 
     };
 
-    console.log("Uploaded file:", req.file);
 
     if (req.file && req.file.filename) {
       updateData.photo = `/uploads/${req.file.filename}`;
@@ -330,7 +329,6 @@ async addCurrentPets(
       updateData.birthday = now;
     }
   
-
     const newPet = new Pet({
       ...updateData,
       owner: userId,
@@ -338,31 +336,28 @@ async addCurrentPets(
 
     await newPet.save();
 
-    await User.findByIdAndUpdate(userId, {
-      $push: { pets: newPet._id },
-    });
-
-
-        const savedPet = await Pet.findById(newPet._id).lean();
+    const savedPet = await Pet.findById(newPet._id).lean();
 
     if (!savedPet) {
       return new ApiError(404, { message: "Pet not found after save" });
     }
 
-    const { _id, species, title, name, birthday, sex, photo, owner } = savedPet;
+    await User.findByIdAndUpdate(userId, {
+      $push: { pets: savedPet },
+    });
 
     return new ApiResponse(true, {
       message: "Pet added successfully",
-        data: {
-          _id: convertId(_id),
-          species,
-          title,
-          name,
-          birthday,
-          sex,
-          photo,
-          owner: convertId(owner),
-        },
+      data: {
+        _id: convertId(savedPet._id),
+        species: savedPet.species,
+        title: savedPet.title,
+        name: savedPet.name,
+        birthday: savedPet.birthday,
+        sex: savedPet.sex,
+        photo: savedPet.photo,
+        owner: convertId(savedPet.owner),
+      },
     });
 
   } catch (error) {

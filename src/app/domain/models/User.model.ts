@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IUsers } from "../users/Users.types";
+import { PetsSchema } from "./Pets.model";
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, minlength: 2, maxlength: 20 },
@@ -11,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   refreshToken: { type: String, default: null },
   noticesFavorites: [{ type: Schema.Types.ObjectId, ref: "Notice" }],
   noticesViewed: [{ type: Schema.Types.ObjectId, ref: "Notice"}],
-  pets: [{ type: Schema.Types.ObjectId, ref: "Pet" }],
+  pets: [PetsSchema],
 },
 { timestamps: true });
 
