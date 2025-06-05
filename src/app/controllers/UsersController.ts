@@ -248,11 +248,13 @@ async patchCurrentEdit(
   try {
     const updateData: Record<string, any> = { ...body };
 
-  if (req.file) {
-    updateData.avatar = `/uploads/${req.file.filename}`;
-  } else if (body.photoUrl) {
-    updateData.avatar = body.photoUrl;
-  }
+      const file = req?.file;
+
+      if (file?.filename) {
+        updateData.photo = `/uploads/${file.filename}`;
+      } else if (body.photoUrl?.trim()) {
+        updateData.photo = body.photoUrl.trim();
+      }
 
     const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
 
