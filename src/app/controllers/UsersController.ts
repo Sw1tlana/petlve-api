@@ -20,7 +20,7 @@ import { ApiError } from "../../helpers/ApiError";
 import { validate } from "class-validator";
 import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
-import { MulterRequest, upload } from "../middlewares/uploads";
+import { MulterRequest, uploadAvatar, uploadPetPhoto } from "../middlewares/uploads";
 import { IPets } from "app/domain/pets/Pets.types";
 import { uploadImageFromPath } from '../../helpers/uploadImage';
 
@@ -36,6 +36,7 @@ interface IUserUpdateBody {
   email?: string;
   phone?: string;
   photoUrl?: string;
+  avatar?: string;
 };
 
 interface IUserAddPetBody {
@@ -240,7 +241,7 @@ async getCurrentFull(@CurrentUser() currentUser: IUsers) {
 
 @Patch("/current/edit")
 @Authorized()
-@UseBefore(upload.single("avatar")) 
+@UseBefore(uploadAvatar.single("avatar"))
 async patchCurrentEdit(
   @CurrentUser() currentUser: IUsers,
   @Req() req: MulterRequest,
@@ -251,15 +252,16 @@ async patchCurrentEdit(
 
   if (req.file?.path) {
     const cloudinaryUrl = await uploadImageFromPath(req.file.path);
-    updateData.photo = cloudinaryUrl;
+    updateData.avatar = cloudinaryUrl;
 
     import('fs').then(fs =>
       fs.unlink(req.file!.path, (err) => {
         if (err) console.error('Error deleting local file:', err);
       })
     );
-  } else if (body.photoUrl?.trim()) {
-    updateData.photo = body.photoUrl.trim();
+      if (body.avatar?.trim()) {
+        updateData.avatar = body.avatar.trim();
+      }
   }
 
     const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
@@ -303,7 +305,7 @@ async patchCurrentEdit(
 
 @Post("/current/pets/add")
 @Authorized()
-@UseBefore(upload.single("photo"))
+@UseBefore(uploadPetPhoto.single("photo"))
 async addCurrentPets(
   @CurrentUser() currentUser: IUsers,
   @Req() req: MulterRequest,
