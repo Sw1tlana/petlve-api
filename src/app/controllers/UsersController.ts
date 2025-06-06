@@ -250,20 +250,18 @@ async patchCurrentEdit(
   try {
     const updateData: Record<string, any> = { ...body };
 
-  if (req.file?.path) {
-    const cloudinaryUrl = await uploadImageFromPath(req.file.path);
-    updateData.avatar = cloudinaryUrl;
+    if (req.file?.path) {
+      const cloudinaryUrl = await uploadImageFromPath(req.file.path);
+      updateData.avatar = cloudinaryUrl;
 
-    import('fs').then(fs =>
-      fs.unlink(req.file!.path, (err) => {
-        if (err) console.error('Error deleting local file:', err);
-      })
-    );
-      if (body.avatar?.trim()) {
-        updateData.avatar = body.avatar.trim();
-      }
-  }
-
+      import('fs').then(fs =>
+        fs.unlink(req.file!.path, (err) => {
+          if (err) console.error('Error deleting local file:', err);
+        })
+      );
+    } else if (body.avatar?.trim()) {
+      updateData.avatar = body.avatar.trim();
+    }
     const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
 
     if (!updatedUser) {
