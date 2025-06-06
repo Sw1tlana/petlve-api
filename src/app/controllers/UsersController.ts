@@ -22,6 +22,7 @@ import { IUsers } from "../domain/users/Users.types";
 import { Pet } from "../domain/models/Pets.model";
 import { MulterRequest, upload } from "../middlewares/uploads";
 import { IPets } from "app/domain/pets/Pets.types";
+import { uploadImageFromPath } from '../../helpers/uploadImage';
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
@@ -248,13 +249,18 @@ async patchCurrentEdit(
   try {
     const updateData: Record<string, any> = { ...body };
 
-      const file = req?.file;
+  if (req.file?.path) {
+    const cloudinaryUrl = await uploadImageFromPath(req.file.path);
+    updateData.photo = cloudinaryUrl;
 
-      if (file?.filename) {
-        updateData.photo = `/uploads/${file.filename}`;
-      } else if (body.photoUrl?.trim()) {
-        updateData.photo = body.photoUrl.trim();
-      }
+    import('fs').then(fs =>
+      fs.unlink(req.file!.path, (err) => {
+        if (err) console.error('Error deleting local file:', err);
+      })
+    );
+  } else if (body.photoUrl?.trim()) {
+    updateData.photo = body.photoUrl.trim();
+  }
 
     const updatedUser = await User.findByIdAndUpdate(currentUser._id, updateData, { new: true });
 
@@ -314,11 +320,17 @@ async addCurrentPets(
       ...req.body, 
     };
 
+    if (req.file?.path) {
+      const cloudinaryUrl = await uploadImageFromPath(req.file.path);
+      updateData.photo = cloudinaryUrl;
 
-    if (req.file && req.file.filename) {
-      updateData.photo = `/uploads/${req.file.filename}`;
-    } else if (body.photoUrl) {
-      updateData.photo = body.photoUrl;
+      import('fs').then(fs =>
+        fs.unlink(req.file!.path, (err) => {
+          if (err) console.error('Error deleting local file:', err);
+        })
+      );
+    } else if (body.photoUrl?.trim()) {
+      updateData.photo = body.photoUrl.trim();
     }
 
     if (!updateData.photo) {
