@@ -4,14 +4,26 @@ import { IUsers } from "../domain/users/Users.types";
 import { ApiError } from "../../helpers/ApiError";
 import { ApiResponse } from "../../helpers/ApiResponse";
 import mongoose from "mongoose";
-import { JsonController, Get, Post, Param, Delete, Authorized, CurrentUser } from "routing-controllers";
+import { JsonController, Get, Post, Param, Delete, Authorized, CurrentUser, QueryParams } from "routing-controllers";
 
 @JsonController("/notices")
 export class NoticesController {
     @Get("/")
-    async getNotices() {
+    async getNotices(@QueryParams() queryParams: any) {
         try {
-        const notices = await Notice.find().lean();
+          let { page = 1, limit = 6 } = queryParams;
+
+            page = parseInt(page);
+            limit = parseInt(limit);
+
+            const skip = (page - 1) * limit;
+
+        const notices = await Notice.find()
+                .skip(skip)
+                .limit(limit)
+                .lean();
+
+    const total = await Notice.countDocuments();
         
     const transformed = notices.map((notice) => ({
       ...notice,
@@ -20,9 +32,17 @@ export class NoticesController {
       location: notice.location?.toString?.(), 
     }));
     
-        return new ApiResponse(true, transformed);
+        return new ApiResponse(true, {
+        data: transformed,
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
+        },
+      });
         }catch(error) {
-            return new ApiError(400, { message: "Validation failed"});
+          return new ApiError(400, { message: "Validation failed"});
         }
 };
 
