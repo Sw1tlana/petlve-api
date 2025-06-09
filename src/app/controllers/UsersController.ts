@@ -338,9 +338,7 @@ async addCurrentPets(
     }
 
     if (updateData.birthday) {
-      const now = new Date();
-      const isoString = now.toISOString();
-      updateData.birthday = now;
+      updateData.birthday = new Date(updateData.birthday);
     }
   
     const newPet = new Pet({
@@ -357,7 +355,7 @@ async addCurrentPets(
     }
 
     await User.findByIdAndUpdate(userId, {
-      $push: { pets: savedPet },
+      $push: { pets: savedPet._id },
     });
 
     return new ApiResponse(true, {
