@@ -355,7 +355,7 @@ async addCurrentPets(
     }
 
     await User.findByIdAndUpdate(userId, {
-      $push: { pets: savedPet._id },
+      $push: { pets: savedPet },
     });
 
     return new ApiResponse(true, {
