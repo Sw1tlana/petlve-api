@@ -23,6 +23,7 @@ import { Pet } from "../domain/models/Pets.model";
 import { MulterRequest, uploadAvatar, uploadPetPhoto } from "../middlewares/uploads";
 import { IPets } from "app/domain/pets/Pets.types";
 import { uploadImageFromPath } from '../../helpers/uploadImage';
+import { INotices } from "app/domain/notices/Notices.types";
 
 const convertId = (id: any) => {
   if (id?.buffer?.data) {
@@ -184,44 +185,40 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
       return new ApiError(404, { message: "User not found" });
     }
 
-    const userFromDb = await User.findById(currentUser._id)
-      .populate({
-        path: 'noticesFavorites',
-        model: 'Notice'
-      })
-      .populate({
-        path: 'pets',
-        model: 'Pet'
-      })
-      .lean();
+const userFromDb = await User.findById(currentUser._id)
+  .populate('noticesFavorites')
+  .populate('pets')
+  .lean();
 
-    if (!userFromDb) {
-      return new ApiError(404, { message: "User not found in database" });
-    }
+  const pets = userFromDb?.pets as unknown as IPets[];
 
-const pets = userFromDb?.pets as unknown as IPets[];
+if (!userFromDb) {
+  return new ApiError(404, { message: "User not found in database" });
+}
 
-  const favoritesObject = Object.fromEntries(
-      (userFromDb.noticesFavorites || []).map((notice: any) => [
-        notice._id.toString(),
-        {
-          _id: notice._id.toString(),
-          species: notice.species,
-          category: notice.category,
-          price: notice.price,
-          title: notice.title,
-          name: notice.name,
-          birthday: notice.birthday,
-          comment: notice.comment,
-          sex: notice.sex,
-          location: notice.location,
-          imgURL: notice.imgURL,
-          createdAt: notice.createdAt,
-          user: notice.user?.toString(),
-          popularity: notice.popularity,
-        }
-      ])
-    );
+const favorites = userFromDb.noticesFavorites as unknown as INotices[]; 
+
+const favoritesObject = Object.fromEntries(
+  favorites.map((notice) => [
+    notice._id.toString(),
+    {
+      _id: notice._id.toString(),
+      species: notice.species,
+      category: notice.category,
+      price: notice.price,
+      title: notice.title,
+      name: notice.name,
+      birthday: notice.birthday,
+      comment: notice.comment,
+      sex: notice.sex,
+      location: notice.location,
+      imgURL: notice.imgURL,
+      createdAt: notice.createdAt,
+      user: notice.user?.toString(),
+      popularity: notice.popularity,
+    },
+  ])
+);
 
 return new ApiResponse(true, {
   _id: userFromDb._id.toString(),

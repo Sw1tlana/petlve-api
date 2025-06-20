@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { INotices } from "../notices/Notices.types";
 
-const NoticeSchema = new mongoose.Schema({
+export const NoticeSchema = new mongoose.Schema({
     species: { type: String, required: true },
     category: { type: String, required: true },
     price: { type: Number, required: true },

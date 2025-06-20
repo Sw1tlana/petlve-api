@@ -1,5 +1,7 @@
+import { Types } from "mongoose";
+
 export interface INotices {
-    id: string;
+     _id: Types.ObjectId | string;
     species: string;
     category: string;
     price: number;
