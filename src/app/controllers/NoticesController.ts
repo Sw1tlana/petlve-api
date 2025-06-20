@@ -114,12 +114,6 @@ async addNoticeFavorites(
       return new ApiError(404, { message: "Notice not found" });
     }
 
-    const favoriteCleaned = {
-      ...favorite,
-      _id: favorite._id.toString(),
-      user: favorite.user?.toString?.(), 
-    };
-
     const isAlreadyFavorite = user.noticesFavorites.some(
       (favId) => favId.toString() === id
     );
@@ -132,15 +126,47 @@ async addNoticeFavorites(
       $push: { noticesFavorites: id },
     });
 
+    const userFromDb = await User.findById(user._id)
+      .populate('noticesFavorites')
+      .lean();
+
+    if (!userFromDb) {
+      return new ApiError(404, { message: "Користувача не знайдено" });
+    }
+
+    const favoritesObject = Object.fromEntries(
+      (userFromDb.noticesFavorites || []).map((notice: any) => [
+        notice._id.toString(),
+        {
+          _id: notice._id.toString(),
+          species: notice.species,
+          category: notice.category,
+          price: notice.price,
+          title: notice.title,
+          name: notice.name,
+          birthday: notice.birthday,
+          comment: notice.comment,
+          sex: notice.sex,
+          location: notice.location,
+          imgURL: notice.imgURL,
+          createdAt: notice.createdAt,
+          user: notice.user?.toString(),
+          popularity: notice.popularity,
+        }
+      ])
+    );
+
     return new ApiResponse(true, {
-      message: "Added to favorites",
-      favorite: favoriteCleaned,
+      _id: userFromDb._id.toString(),
+      name: userFromDb.name,
+      email: userFromDb.email,
+      noticesFavorites: favoritesObject,
     });
 
-  } catch (error) {
-    return new ApiError(500, { message: "Internal server error" });
-  }
-};
+      } catch (error) {
+        return new ApiError(500, { message: "Internal server error" });
+      }
+    };
 
 @Delete("/favorites/remove/:id")
 @Authorized()
@@ -190,6 +216,4 @@ async deleteNoticeFavorites(
     return new ApiError(500, { message: "Internal server error" });
   }
 };
-
-
 };

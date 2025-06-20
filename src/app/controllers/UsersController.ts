@@ -185,15 +185,43 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
     }
 
     const userFromDb = await User.findById(currentUser._id)
-      .populate('noticesFavorites') 
-      .populate('pets') 
-      .lean(); 
+      .populate({
+        path: 'noticesFavorites',
+        model: 'Notice'
+      })
+      .populate({
+        path: 'pets',
+        model: 'Pet'
+      })
+      .lean();
 
     if (!userFromDb) {
       return new ApiError(404, { message: "User not found in database" });
     }
 
 const pets = userFromDb?.pets as unknown as IPets[];
+
+  const favoritesObject = Object.fromEntries(
+      (userFromDb.noticesFavorites || []).map((notice: any) => [
+        notice._id.toString(),
+        {
+          _id: notice._id.toString(),
+          species: notice.species,
+          category: notice.category,
+          price: notice.price,
+          title: notice.title,
+          name: notice.name,
+          birthday: notice.birthday,
+          comment: notice.comment,
+          sex: notice.sex,
+          location: notice.location,
+          imgURL: notice.imgURL,
+          createdAt: notice.createdAt,
+          user: notice.user?.toString(),
+          popularity: notice.popularity,
+        }
+      ])
+    );
 
 return new ApiResponse(true, {
   _id: userFromDb._id.toString(),
@@ -209,7 +237,7 @@ return new ApiResponse(true, {
     photo: pet.photo,
     owner: pet.owner.toString(),
   })),
-  noticesFavorites: userFromDb.noticesFavorites,
+  noticesFavorites: favoritesObject,
 });
 
   } catch (error) {
