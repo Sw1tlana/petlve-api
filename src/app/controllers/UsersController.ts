@@ -181,61 +181,61 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
   try { 
 
     if (!currentUser) {
-      console.log("User not found");
       return new ApiError(404, { message: "User not found" });
     }
 
-const userFromDb = await User.findById(currentUser._id)
-  .populate('noticesFavorites')
-  .populate('pets')
-  .lean();
+    const userFromDb = await User.findById(currentUser._id)
+      .populate('pets')
+      .populate('noticesFavorites')
+      .lean();
 
-  const pets = userFromDb?.pets as unknown as IPets[];
+    if (!userFromDb) {
+      return new ApiError(404, { message: "User not found in database" });
+    }
 
-if (!userFromDb) {
-  return new ApiError(404, { message: "User not found in database" });
-}
+    const pets = userFromDb.pets as unknown as IPets[];
+    const favorites = userFromDb.noticesFavorites as unknown as INotices[];
 
-const favorites = userFromDb.noticesFavorites as unknown as INotices[]; 
+    const favoritesObject = Object.fromEntries(
+      favorites.map((notice) => [
+        notice._id.toString(),
+        {
+          _id: notice._id.toString(),
+          species: notice.species,
+          category: notice.category,
+          price: notice.price,
+          title: notice.title,
+          name: notice.name,
+          birthday: notice.birthday,
+          comment: notice.comment,
+          sex: notice.sex,
+          location: notice.location,
+          imgURL: notice.imgURL,
+          createdAt: notice.createdAt,
+          user: notice.user?.toString(),
+          popularity: notice.popularity,
+        },
+      ])
+    );
 
-const favoritesObject = Object.fromEntries(
-  favorites.map((notice) => [
-    notice._id.toString(),
-    {
-      _id: notice._id.toString(),
-      species: notice.species,
-      category: notice.category,
-      price: notice.price,
-      title: notice.title,
-      name: notice.name,
-      birthday: notice.birthday,
-      comment: notice.comment,
-      sex: notice.sex,
-      location: notice.location,
-      imgURL: notice.imgURL,
-      createdAt: notice.createdAt,
-      user: notice.user?.toString(),
-      popularity: notice.popularity,
-    },
-  ])
-);
+    const petsFormatted = pets.map(pet => ({
+      _id: pet._id.toString(),
+      species: pet.species,
+      title: pet.title,
+      name: pet.name,
+      birthday: pet.birthday,
+      sex: pet.sex,
+      photo: pet.photo,
+      owner: pet.owner.toString(),
+    }));
 
-return new ApiResponse(true, {
-  _id: userFromDb._id.toString(),
-  name: userFromDb.name,
-  email: userFromDb.email,
-  pets: pets.map(pet => ({
-    _id: pet._id.toString(),
-    species: pet.species,
-    title: pet.title,
-    name: pet.name,
-    birthday: pet.birthday,
-    sex: pet.sex,
-    photo: pet.photo,
-    owner: pet.owner.toString(),
-  })),
-  noticesFavorites: favoritesObject,
-});
+    return new ApiResponse(true, {
+      _id: userFromDb._id.toString(),
+      name: userFromDb.name,
+      email: userFromDb.email,
+      pets: petsFormatted,
+      noticesFavorites: favoritesObject,
+    });
 
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });

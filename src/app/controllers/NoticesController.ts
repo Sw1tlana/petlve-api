@@ -5,6 +5,14 @@ import { ApiError } from "../../helpers/ApiError";
 import { ApiResponse } from "../../helpers/ApiResponse";
 import mongoose from "mongoose";
 import { JsonController, Get, Post, Param, Delete, Authorized, CurrentUser, QueryParams } from "routing-controllers";
+import { Types } from "mongoose";
+
+const convertId = (id: any) => {
+  if (id?.buffer?.data) {
+    return new Types.ObjectId(Buffer.from(id.buffer.data)).toString();
+  }
+  return id?.toString() || null;
+};
 
 @JsonController("/notices")
 export class NoticesController {
@@ -107,112 +115,110 @@ async addNoticeFavorites(
   @CurrentUser() user: IUsers
 ) {
   try {
-
     const favorite = await Notice.findById(id).lean();
 
-    if (!favorite) {
-      return new ApiError(404, { message: "Notice not found" });
-    }
+      if (!favorite) {
+        return new ApiError(404, { message: "Notice not found" });
+      }
 
-    const isAlreadyFavorite = user.noticesFavorites.some(
-      (favId) => favId.toString() === id
-    );
+      const isAlreadyFavorite = user.noticesFavorites.some(
+        (fav: any) => fav._id?.toString() === id
+      );
 
-    if (isAlreadyFavorite) {
-      return new ApiResponse(true, { message: "Already in favorites" });
-    }
+      if (isAlreadyFavorite) {
+        return new ApiResponse(true, { message: "Already in favorites" });
+      }
 
-    await User.findByIdAndUpdate(user._id, {
-      $push: { noticesFavorites: id },
-    });
+      const noticeSnapshot = {
+        _id: convertId(favorite._id),
+        species: favorite.species,
+        category: favorite.category,
+        price: favorite.price,
+        title: favorite.title,
+        name: favorite.name,
+        birthday: favorite.birthday,
+        comment: favorite.comment,
+        sex: favorite.sex,
+        location: favorite.location,
+        imgURL: favorite.imgURL,
+        createdAt: favorite.createdAt,
+        user: favorite.user?.toString(),
+        popularity: favorite.popularity,
+      };
 
-    const userFromDb = await User.findById(user._id)
-      .populate('noticesFavorites')
-      .lean();
+      await User.findByIdAndUpdate(user._id, {
+        $push: { noticesFavorites: noticeSnapshot },
+      });
 
-    if (!userFromDb) {
-      return new ApiError(404, { message: "Користувача не знайдено" });
-    }
+      const userFromDb = await User.findById(user._id).lean();
 
-    const favoritesObject = Object.fromEntries(
-      (userFromDb.noticesFavorites || []).map((notice: any) => [
-        notice._id.toString(),
-        {
-          _id: notice._id.toString(),
-          species: notice.species,
-          category: notice.category,
-          price: notice.price,
-          title: notice.title,
-          name: notice.name,
-          birthday: notice.birthday,
-          comment: notice.comment,
-          sex: notice.sex,
-          location: notice.location,
-          imgURL: notice.imgURL,
-          createdAt: notice.createdAt,
-          user: notice.user?.toString(),
-          popularity: notice.popularity,
-        }
-      ])
-    );
+      if (!userFromDb) {
+        return new ApiError(404, { message: "Користувача не знайдено" });
+      }
 
-    return new ApiResponse(true, {
-      _id: userFromDb._id.toString(),
-      name: userFromDb.name,
-      email: userFromDb.email,
-      noticesFavorites: favoritesObject,
-    });
+    const normalizeFavorites = (favorites: any[]) =>
+      favorites
+        .map((fav: any) => {
+          fav._id = convertId(fav._id);
+          fav.user = convertId(fav.user);
+          return fav;
+        })
+        .filter((fav: any) => typeof fav._id === 'string');
+
+      return new ApiResponse(true, {
+        _id: convertId(userFromDb._id),
+        name: userFromDb.name,
+        email: userFromDb.email,
+        noticesFavorites: normalizeFavorites(userFromDb.noticesFavorites),
+      });
 
       } catch (error) {
         return new ApiError(500, { message: "Internal server error" });
       }
     };
 
-@Delete("/favorites/remove/:id")
-@Authorized()
-async deleteNoticeFavorites(
-  @Param('id') rawId: any,
-  @CurrentUser() user: IUsers
-) {
-  try {
-    const id = mongoose.Types.ObjectId.isValid(rawId) 
-    ? new mongoose.Types.ObjectId(rawId).toString()
-    : null;
+    @Delete("/favorites/remove/:id")
+    @Authorized()
+    async deleteNoticeFavorites(
+      @Param('id') rawId: any,
+      @CurrentUser() user: IUsers
+    ) {
+        try {
+      const id = mongoose.Types.ObjectId.isValid(rawId)
+        ? new mongoose.Types.ObjectId(rawId).toString()
+        : null;
 
-  if (!id) {
-    return new ApiError(400, { message: "Invalid ID format" });
-  }
+      if (!id) {
+        return new ApiError(400, { message: "Некоректний формат ID" });
+      }
 
-    const isFavorite = user.noticesFavorites.some(
-      (favId) => favId.toString() === id
-    );
+      const isFavorite = user.noticesFavorites.some(
+        (fav: any) => convertId(fav._id) === id
+      );
 
-    if (!isFavorite) {
-      return new ApiError(404, { message: "Notice not in favorites" });
-    }
+      if (!isFavorite) {
+        return new ApiError(404, { message: "Оголошення не в обраних" });
+      }
 
-    await User.findByIdAndUpdate(user._id, {
-      $pull: { noticesFavorites: id }
-    });
+      await User.findByIdAndUpdate(user._id, {
+        $pull: { noticesFavorites: { _id: new mongoose.Types.ObjectId(id) } },
+      });
 
-    const removeFavorite = await Notice.findById(id).lean();
+      const removedNotice = await Notice.findById(id).lean();
 
-    if (!removeFavorite) {
-      return new ApiError(404, { message: "Notice not found" });
-    }
+      if (!removedNotice) {
+        return new ApiError(404, { message: "Оголошення не знайдено" });
+      }
 
-    const favoriteCleaned = {
-      ...removeFavorite,
-      _id: removeFavorite._id?.toString?.(),
-      user: removeFavorite.user?.toString?.(),
-    };
-
-    return new ApiResponse(true, {
-      message: "Removed from favorites",
-      data: favoriteCleaned,
-    });
-
-  } catch (error) {
+      return new ApiResponse(true, {
+        message: "Успішно видалено з обраного",
+        data: {
+          ...removedNotice,
+          _id: convertId(removedNotice._id),
+          user: convertId(removedNotice.user),
+        },
+      });
+    } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
   }
 };
