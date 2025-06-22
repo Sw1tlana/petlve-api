@@ -75,8 +75,6 @@ export class UsersController {
         token, 
         refreshToken 
       });
-      await newUser.save();
-      
 
       const savedUser = await newUser.save();
   

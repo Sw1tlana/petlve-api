@@ -1,7 +1,7 @@
 import { IsDate, IsNumber, IsString  } from "class-validator";
 import { INotices } from "../notices/Notices.types";
 
-export class CreateNotices implements Omit<INotices, "id"> {
+export class CreateNotices implements Omit<INotices, "_id"> {
 
     @IsString()
     species: string;
