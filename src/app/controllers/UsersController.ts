@@ -418,36 +418,42 @@ async removeCurrentPets(
       throw new ApiError(400, { message: "Invalid ID format" });
     }
 
-    const removePets = await Pet.findById(id).lean();
-    
-    if (!removePets) {
+    const petToRemove = await Pet.findById(id).lean();
+    if (!petToRemove) {
       throw new ApiError(404, { message: "Pet not found" });
     }
 
-    const isPetInList = user.pets.some((pet) => pet.toString() === id);
+    const freshUser = await User.findById(user._id).lean();
+    if (!freshUser) {
+      throw new ApiError(404, { message: "User not found" });
+    }
+
+    const isPetInList = freshUser.pets.some(pet => {
+      if (typeof pet === 'object' && pet !== null && pet._id) {
+        return pet._id.toString() === id;
+      } else {
+        return pet.toString() === id;
+      }
+    });
 
     if (!isPetInList) {
       throw new ApiError(404, { message: "Pet not linked to user" });
     }
-
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: user._id },
-      { $pull: { pets: id } },
+  
+    await User.findByIdAndUpdate(
+      user._id,
+      { $pull: { pets: { _id: new mongoose.Types.ObjectId(id) } } },
       { new: true }
-    );
-
-    if (!updatedUser) {
-      throw new ApiError(404, { message: "User not found or pet not linked" });
-    }
+    ).lean();
 
     await Pet.findByIdAndDelete(id);
 
     return new ApiResponse(true, { 
       message: "Removed from pets", 
       data: {
-        ...removePets,
-        _id: convertId(removePets._id),
-        owner: convertId(removePets.owner)
+        ...petToRemove,
+        _id: convertId(petToRemove._id),
+        owner: convertId(petToRemove.owner)
       }
     });
 

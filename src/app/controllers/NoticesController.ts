@@ -153,7 +153,7 @@ async addNoticeFavorites(
       const userFromDb = await User.findById(user._id).lean();
 
       if (!userFromDb) {
-        return new ApiError(404, { message: "Користувача не знайдено" });
+        return new ApiError(404, { message: "User not found" });
       }
 
     const normalizeFavorites = (favorites: any[]) =>
@@ -189,7 +189,7 @@ async addNoticeFavorites(
         : null;
 
       if (!id) {
-        return new ApiError(400, { message: "Некоректний формат ID" });
+        return new ApiError(400, { message: "Incorrect ID format" });
       }
 
       const isFavorite = user.noticesFavorites.some(
@@ -197,7 +197,7 @@ async addNoticeFavorites(
       );
 
       if (!isFavorite) {
-        return new ApiError(404, { message: "Оголошення не в обраних" });
+        return new ApiError(404, { message: "Ad not in favorites" });
       }
 
       await User.findByIdAndUpdate(user._id, {
@@ -207,11 +207,11 @@ async addNoticeFavorites(
       const removedNotice = await Notice.findById(id).lean();
 
       if (!removedNotice) {
-        return new ApiError(404, { message: "Оголошення не знайдено" });
+        return new ApiError(404, { message: "No ads found" });
       }
 
       return new ApiResponse(true, {
-        message: "Успішно видалено з обраного",
+        message: "Successfully removed from favorites",
         data: {
           ...removedNotice,
           _id: convertId(removedNotice._id),
