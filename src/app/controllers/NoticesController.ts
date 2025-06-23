@@ -210,14 +210,7 @@ async addNoticeFavorites(
         return new ApiError(404, { message: "No ads found" });
       }
 
-      return new ApiResponse(true, {
-        message: "Successfully removed from favorites",
-        data: {
-          ...removedNotice,
-          _id: convertId(removedNotice._id),
-          user: convertId(removedNotice.user),
-        },
-      });
+      return new ApiResponse(true, { _id: id });
     } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
   }
