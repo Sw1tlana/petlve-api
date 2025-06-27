@@ -194,46 +194,41 @@ async getCurrentUser(@CurrentUser() currentUser: IUsers) {
     const pets = userFromDb.pets as unknown as IPets[];
     const favorites = userFromDb.noticesFavorites as unknown as INotices[];
 
-    const favoritesObject = Object.fromEntries(
-      favorites.map((notice) => [
-        notice._id.toString(),
-        {
-          _id: notice._id.toString(),
-          species: notice.species,
-          category: notice.category,
-          price: notice.price,
-          title: notice.title,
-          name: notice.name,
-          birthday: notice.birthday,
-          comment: notice.comment,
-          sex: notice.sex,
-          location: notice.location,
-          imgURL: notice.imgURL,
-          createdAt: notice.createdAt,
-          user: notice.user?.toString(),
-          popularity: notice.popularity,
-        },
-      ])
-    );
+      const favoritesArray = favorites.map((notice) => ({
+        _id: notice._id.toString(),
+        species: notice.species,
+        category: notice.category,
+        price: notice.price,
+        title: notice.title,
+        name: notice.name,
+        birthday: notice.birthday,
+        comment: notice.comment,
+        sex: notice.sex,
+        location: notice.location,
+        imgURL: notice.imgURL,
+        createdAt: notice.createdAt,
+        user: notice.user?.toString(),
+        popularity: notice.popularity,
+      }));
 
-    const petsFormatted = pets.map(pet => ({
-      _id: pet._id.toString(),
-      species: pet.species,
-      title: pet.title,
-      name: pet.name,
-      birthday: pet.birthday,
-      sex: pet.sex,
-      photo: pet.photo,
-      owner: pet.owner.toString(),
-    }));
+      const petsFormatted = pets.map(pet => ({
+        _id: pet._id.toString(),
+        species: pet.species,
+        title: pet.title,
+        name: pet.name,
+        birthday: pet.birthday,
+        sex: pet.sex,
+        photo: pet.photo,
+        owner: pet.owner.toString(),
+      }));
 
-    return new ApiResponse(true, {
-      _id: userFromDb._id.toString(),
-      name: userFromDb.name,
-      email: userFromDb.email,
-      pets: petsFormatted,
-      noticesFavorites: favoritesObject,
-    });
+      return new ApiResponse(true, {
+        _id: userFromDb._id.toString(),
+        name: userFromDb.name,
+        email: userFromDb.email,
+        pets: petsFormatted,
+        noticesFavorites: favoritesArray,
+      });
 
   } catch (error) {
     return new ApiError(500, { message: "Internal server error" });
