@@ -13,7 +13,7 @@ export interface INotices {
     location: string;
     imgURL: string;
     createdAt: Date;
-    user: string;
+    user?: Types.ObjectId | string;
     popularity: number;
     updatedAt: Date;
 }

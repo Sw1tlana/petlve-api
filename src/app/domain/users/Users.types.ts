@@ -1,4 +1,6 @@
 import { Types } from "mongoose";
+import { IPets } from "../pets/Pets.types";
+import { INotices } from "../notices/Notices.types";
 
 export interface IUsers {
   _id: Types.ObjectId; 
@@ -9,6 +11,6 @@ export interface IUsers {
   avatar?: string;
   token?: string;
   refreshToken?: string;
-  noticesFavorites: Types.ObjectId[];
-  pets: Types.ObjectId[];
+  pets: IPets[];
+  noticesFavorites: INotices[];
   }

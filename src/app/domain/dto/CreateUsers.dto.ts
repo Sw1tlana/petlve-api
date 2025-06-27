@@ -1,6 +1,6 @@
 import { IsEmail, Length, IsString, IsPhoneNumber, IsOptional, IsArray } from "class-validator";
 import { IUsers } from "../users/Users.types";
-import { Types } from "mongoose";
+import { IPets } from "../pets/Pets.types";
 
 export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
   @Length(2, 20)
@@ -20,7 +20,7 @@ export class CreateUsers implements Omit<IUsers, "_id" | "noticesFavorites"> {
 
   @IsArray()
   @IsOptional() 
-  pets: Types.ObjectId[] = [];
+  pets: IPets[];
 
   @IsOptional()
   @IsString()
